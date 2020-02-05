@@ -84,15 +84,38 @@ for folder = 4:length(Subfolders)
                         else
                             if Ch < 36
                                 Resting_HbO = squeeze(dc_rest(start_point:start_point+fs*rt,1,Ch));
-                                sim_data = AR_simulate(Resting_HbO,1);
+                                order = 5;
+                                Md = arima(order,0,0);
+                                try
+                                    EstMd = estimate(Md,Resting_HbO,'Display','off');
+                                catch
+                                    continue
+                                end
+                                Constant = EstMd.Constant;
+                                AR = cell2mat(EstMd.AR)';
+                                Variance = EstMd.Variance;
+                                EstMd_HbO = arima('Constant',Constant,'AR',AR,'Variance',Variance); 
+                                sim_data = simulate(EstMd_HbO,fs*pt,'NumPaths',1);
                                 simulated_HbO(end+1,:) = sim_data;
                             else
                                 Resting_HbR = squeeze(dc_rest(start_point:start_point+fs*rt,2,Ch-36));
-                                sim_data = AR_simulate(Resting_HbR,1);
+                                order = 5;
+                                Md = arima(order,0,0);
+                                try
+                                    EstMd = estimate(Md,Resting_HbR,'Display','off');
+                                catch
+                                    continue
+                                end
+                                Constant = EstMd.Constant;
+                                AR = cell2mat(EstMd.AR)';
+                                Variance = EstMd.Variance;
+                                EstMd_HbR = arima('Constant',Constant,'AR',AR,'Variance',Variance); 
+                                sim_data = simulate(EstMd_HbO,fs*pt,'NumPaths',1);
                                 simulated_HbR(end+1,:) = sim_data;
                             end
                             break
                         end
+                            
                     end
                 end
             end
