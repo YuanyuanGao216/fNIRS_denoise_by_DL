@@ -28,7 +28,7 @@ for folder = 4:length(Subfolders)
     fprintf('subject is %s\n',name);
     SubDir = [DataDir,'/',name];
     Files = dir(fullfile(SubDir,'*.nirs'));
-    for file = 3:length(Files)
+    for file = 1:length(Files)
         filename = Files(file).name;
         fprintf('fnirs file is %s\n',filename);
         fNIRS_data = load([SubDir,'/',filename],'-mat');
@@ -46,7 +46,7 @@ for folder = 4:length(Subfolders)
         [~,tIncChAuto]  =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,30,200);
         dod             =   hmrBandpassFilt(dod,t,0,0.5);
         dc              =   hmrOD2Conc(dod,SD,[6  6]);
-        %% select period outside trials
+        %% select period outside trials and fit AR(5) model, simulate new data
         if size(fNIRS_data.s,2) ~= 1
             fNIRS_data.s = sum(fNIRS_data.s,2);
         end
@@ -73,10 +73,9 @@ for folder = 4:length(Subfolders)
             if (rest_end-rest_start)/fs < rt
                 continue
             else
-                for Ch = Ch_list
-                    if Ch ~= 66
-                        continue
-                    end
+%                 for Ch = Ch_list
+                for Ch = 1
+
                     % 0 in tIncAuto means artifact
                     tIncAuto = tIncChAuto(rest_start:rest_end,Ch);
                     dc_rest = dc(rest_start:rest_end,:,:);
@@ -89,16 +88,17 @@ for folder = 4:length(Subfolders)
                                 Resting_HbO = squeeze(dc_rest(start_point:start_point+fs*rt,1,Ch));
                                 order = 5;
                                 Md = arima(order,0,0);
-                                EstMd = estimate(Md,Resting_HbO,'Display','off');
+                                try
+                                    EstMd = estimate(Md,Resting_HbO,'Display','off');
+                                catch
+                                    continue
+                                end
                                 Constant = EstMd.Constant;
                                 AR = cell2mat(EstMd.AR)';
                                 Variance = EstMd.Variance;
                                 EstMd_HbO = arima('Constant',Constant,'AR',AR,'Variance',Variance); 
                                 sim_data = simulate(EstMd_HbO,fs*pt,'NumPaths',1);
                                 simulated_HbO(end+1,:) = sim_data;
-%                                 figure
-%                                 plot(Resting_HbO);hold on;
-%                                 plot(sim_data);hold on;
                             else
                                 Resting_HbR = squeeze(dc_rest(start_point:start_point+fs*rt,2,Ch-36));
                                 order = 5;
@@ -108,7 +108,6 @@ for folder = 4:length(Subfolders)
                                 catch
                                     continue
                                 end
-                                EstMd = estimate(Md,Resting_HbR,'Display','off');
                                 Constant = EstMd.Constant;
                                 AR = cell2mat(EstMd.AR)';
                                 Variance = EstMd.Variance;
@@ -126,6 +125,7 @@ for folder = 4:length(Subfolders)
     end
 end
 fprintf('How many resting period? %d\n',size(simulated_HbR,1))
+
 % %-------------read fnirs data ----------------------------------
 % files = dir('*.nirs');
 % n_files = length(files);

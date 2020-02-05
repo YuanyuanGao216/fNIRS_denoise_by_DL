@@ -37,8 +37,8 @@ for folder = 4:length(Subfolders)
         SD          =   fNIRS_data.SD;
         t           =   fNIRS_data.t;
         fs          =   1/(t(2)-t(1));
-        rt = 195/fs;%resting time 24.96s
-        pt = 512/fs;%performance time 65.536s
+        rt          =   195/fs; %resting time 24.96s
+        pt          =   512/fs; %performance time 65.536s
         tIncMan     =   ones(size(t));
         %% standard processing wo correction
         SD              =   enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
