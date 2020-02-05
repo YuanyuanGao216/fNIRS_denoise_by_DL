@@ -46,7 +46,7 @@ for folder = 4:length(Subfolders)
         [~,tIncChAuto]  =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,30,200);
         dod             =   hmrBandpassFilt(dod,t,0,0.5);
         dc              =   hmrOD2Conc(dod,SD,[6  6]);
-        %% select period outside trials
+        %% select period outside trials and fit AR(5) model, simulate new data
         if size(fNIRS_data.s,2) ~= 1
             fNIRS_data.s = sum(fNIRS_data.s,2);
         end
@@ -60,7 +60,7 @@ for folder = 4:length(Subfolders)
         Ch_list([Ch_short;Ch_Prune]) = [];
         for i = 1:2:n_stim+1
             if i == 1
-                rest_start = 0;
+                rest_start = 1;
                 rest_end = stimuli_list(i);
             elseif i == n_stim+1
                 rest_start = stimuli_list(i-1);
@@ -74,6 +74,7 @@ for folder = 4:length(Subfolders)
                 continue
             else
                 for Ch = Ch_list
+
                     % 0 in tIncAuto means artifact
                     tIncAuto = tIncChAuto(rest_start:rest_end,Ch);
                     dc_rest = dc(rest_start:rest_end,:,:);
@@ -122,61 +123,10 @@ for folder = 4:length(Subfolders)
         end
     end
 end
-fprintf('How many resting period? %d\n',size(simulated_HbR,1))
+% fprintf('How many resting period? %d\n',size(simulated_HbR,1))
+save('Processed_data/simulated_HbO','-mat')
+save('Processed_data/simulated_HbR','-mat')
 
-% %-------------read fnirs data ----------------------------------
-% files = dir('*.nirs');
-% n_files = length(files);
-% % fs = 25;
-% fs_file = load('Attending 1-FLS.nirs','-mat');
-% fs = 1/(fs_file.t(2) - fs_file.t(1));
-% clear fs_file
-% % fs = 1;%down sampled to f = 1hz
-% rt = 25;%resting time 25s
-% pt = 512/fs;%performance time 32s
-% R_HbO = nan(fs*rt,33*5*n_files);
-% R_HbR = nan(fs*rt,33*5*n_files);
-% P_HbO = nan(fs*pt,33*5*n_files);
-% P_HbR = nan(fs*pt,33*5*n_files);
-% nth = 0;
-% for file =files'
-%     [Resting_HbO,Resting_HbR,Performing_HbO,Performing_HbR] = readfNIRSData(file,fs,rt,pt);
-%     R_HbO(:,(165*nth+1):(165*(nth+1))) = Resting_HbO;
-%     R_HbR(:,(165*nth+1):(165*(nth+1))) = Resting_HbR;
-%     P_HbO(:,(165*nth+1):(165*(nth+1))) = Performing_HbO;
-%     P_HbR(:,(165*nth+1):(165*(nth+1))) = Performing_HbR;
-%     nth = nth +1;
-% end
-% cd(oldfolder)
-% save('datasets\HbO_exp.txt','P_HbO','-ascii')
-% save('datasets\HbR_exp.txt','P_HbR','-ascii')
-% %% uncomment to detect abnormal in R_HbR
-% % for i=1:size(R_HbR,2)
-% %     if any(R_HbR(:,i)<-2)
-% %         break
-% %     end
-% % end
-% % colum #2696 in R_HbR is abnormal
-% R_HbR(:,2696) = nan;
-% %% estimate AR order from resting fnirs data
-% % R = [R_HbO;R_HbR];
-% % [R_HbO_orders,R_HbR_orders] = estimate_order(R);
-% % R_HbO_orders(R_HbO_orders<2)=nan;
-% % R_HbR_orders(R_HbO_orders<2)=nan;
-% % R_HbO_median_orders = nanmedian(R_HbO_orders);
-% % R_HbR_median_orders = nanmedian(R_HbR_orders);
-% 
-% %%
-% % the unit is micromolar (µM)
-% %The AR coefficients were taken as the median values across subjects from an AR(5)model fit to the experimental data. 
-% %Two sets of AR coefficients were used in the simulations based on AR(5) model fits to the HbO2 and Hb channels
-% R_HbO_median_orders = 2;
-% R_HbR_median_orders = 2;
-% EstMd_HbO = median_coef(R_HbO,R_HbO_median_orders);
-% EstMd_HbR = median_coef(R_HbR,R_HbR_median_orders);
-% simulated_HbO = simulate(EstMd_HbO,fs*pt,'NumPaths',double(m)).*1000000;
-% simulated_HbR = simulate(EstMd_HbR,fs*pt,'NumPaths',double(m)).*1000000;
-% %% motion artifacts
 % %------------------------Lap. dist. spikes-----------------------------
 % %f(t) = A*exp(-abs(t-t0)/b)
 % f = zeros(fs*pt,m);
