@@ -6,4 +6,4 @@ clc
 SimulateData
 SimulateMotionArtifacts(pd_HbO,pd_HbR);
 BuildRealData
-Plot_MAR_results
+Plot_Results

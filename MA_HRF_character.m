@@ -19,16 +19,20 @@ diff_HbO_list = [];
 diff_HbR_list = [];
 n_MA_HbO_list = [];
 n_MA_HbR_list = [];
-Real_HbO = [];
-Real_HbR = [];
-HbO_Spline = [];
-HbR_Spline = [];
+Real_HbO    = [];
+Real_HbR    = [];
+HbO_Spline  = [];
+HbR_Spline  = [];
 HbO_Wavelet = [];
 HbR_Wavelet = [];
-HbO_Kalman = [];
-HbR_Kalman = [];
-HbO_PCA = [];
-HbR_PCA = [];
+HbO_Kalman  = [];
+HbR_Kalman  = [];
+HbO_PCA97   = [];
+HbR_PCA97   = [];
+HbO_PCA80   = [];
+HbR_PCA80   = [];
+HbO_Cbsi    = [];
+HbR_Cbsi    = [];
 
 n_Spline_HbO = 0;
 n_Spline_HbR = 0;
@@ -36,8 +40,12 @@ n_Wavelet_HbO = 0;
 n_Wavelet_HbR = 0;
 n_Kalman_HbO = 0;
 n_Kalman_HbR = 0;
-n_PCA_HbO = 0;
-n_PCA_HbR = 0;
+n_PCA97_HbO = 0;
+n_PCA97_HbR = 0;
+n_PCA80_HbO = 0;
+n_PCA80_HbR = 0;
+n_Cbsi_HbO = 0;
+n_Cbsi_HbR = 0;
 
 %% load fNIRS file
 % loop subfolders and files
@@ -72,18 +80,30 @@ for folder = 4:length(Subfolders)
         dod             =   hmrBandpassFilt(dod,t,0,0.5);
 
         dc              =   hmrOD2Conc(dod,SD,[6  6]);
-        %% standard processing with PCA
+        %% standard processing with PCA97
         SD                      =   enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
 
         dod                     =   hmrIntensity2OD(d);
 
-        [dod_PCA,~,~,~,~]       =   hmrMotionCorrectPCArecurse(dod,t,SD,tIncMan,0.5,1,30,200,0.97,5);
+        [dod_PCA97,~,~,~,~]     =   hmrMotionCorrectPCArecurse(dod,t,SD,tIncMan,0.5,1,30,200,0.97,5);
 
-        [tIncAuto_PCA]          =   hmrMotionArtifact(dod_PCA,t,SD,tIncMan,0.5,1,30,200);
+        [~,tIncAuto_PCA97]      =   hmrMotionArtifactByChannel(dod_PCA97,t,SD,tIncMan,0.5,1,30,200);
 
-        dod_PCA                 =   hmrBandpassFilt(dod_PCA,t,0,0.5);
+        dod_PCA97               =   hmrBandpassFilt(dod_PCA97,t,0,0.5);
 
-        dc_PCA                  =   hmrOD2Conc(dod_PCA,SD,[6  6]);
+        dc_PCA97                =   hmrOD2Conc(dod_PCA97,SD,[6  6]);
+        %% standard processing with PCA80
+        SD                      =   enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
+
+        dod                     =   hmrIntensity2OD(d);
+
+        [dod_PCA80,~,~,~,~]     =   hmrMotionCorrectPCArecurse(dod,t,SD,tIncMan,0.5,1,30,200,0.80,5);
+
+        [~, tIncAuto_PCA80]     =   hmrMotionArtifactByChannel(dod_PCA80,t,SD,tIncMan,0.5,1,30,200);
+
+        dod_PCA80               =   hmrBandpassFilt(dod_PCA80,t,0,0.5);
+
+        dc_PCA80                =   hmrOD2Conc(dod_PCA80,SD,[6  6]);
         %% standard processing with Spline
         SD                              =   enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
 
@@ -105,7 +125,7 @@ for folder = 4:length(Subfolders)
 
         [dod_Wavelet]       =   hmrMotionCorrectWavelet(dod,SD,0.1);
 
-        [tIncAuto_Wavelet]  =   hmrMotionArtifact(dod_Wavelet,t,SD,tIncMan,0.5,1,30,200);
+        [~,tIncAuto_Wavelet]=   hmrMotionArtifactByChannel(dod_Wavelet,t,SD,tIncMan,0.5,1,30,200);
 
         dod_Wavelet         =   hmrBandpassFilt(dod_Wavelet,t,0,0.5);
 
@@ -129,6 +149,20 @@ for folder = 4:length(Subfolders)
         [tIncAuto_Kalman]   =   hmrMotionArtifact(dod_Kalman,t,SD,tIncMan,0.5,1,30,200);
         dod_Kalman          =   hmrBandpassFilt(dod_Kalman,t,0,0.5);
         dc_Kalman           =   hmrOD2Conc(dod_Kalman,SD,[6  6]);
+        %% hmrCbsi
+        SD = enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
+
+        dod = hmrIntensity2OD(d);
+
+        dod = hmrBandpassFilt(dod,t,0,0.5);
+
+        dc = hmrOD2Conc(dod,SD,[6  6]);
+
+        [dc_Cbsi] = hmrMotionCorrectCbsi(dc,SD,0);
+
+        dod_Cbsi = hmrConc2OD(dc_Cbsi,SD,[6  6]);
+
+        [~,tIncAuto_Cbsi] = hmrMotionArtifactByChannel(dod_Cbsi,t,SD,tIncMan,0.5,1,30,200);
         %%
         % select first 65s (512 points) period within trials
         if size(fNIRS_data.s,2) ~= 1
@@ -183,7 +217,9 @@ for folder = 4:length(Subfolders)
                     HbO_Spline(end+1,:)     =   squeeze(dc_Spline(stim_start:512,1,Ch));
                     HbO_Wavelet(end+1,:)    =   squeeze(dc_Wavelet(stim_start:512,1,Ch));
                     HbO_Kalman(end+1,:)     =   squeeze(dc_Kalman(stim_start:512,1,Ch));
-                    HbO_PCA(end+1,:)        =   squeeze(dc_PCA(stim_start:512,1,Ch));
+                    HbO_PCA97(end+1,:)      =   squeeze(dc_PCA97(stim_start:512,1,Ch));
+                    HbO_PCA80(end+1,:)      =   squeeze(dc_PCA80(stim_start:512,1,Ch));
+                    HbO_Cbsi(end+1,:)       =   squeeze(dc_Cbsi(stim_start:512,1,Ch));
                     % save the number of trials left
                     [n_MA_Spline,~,~]       =   CalMotionArtifact(tIncChAuto_after_Spline(stim_start:512,Ch));
                     n_Spline_HbO            =   n_Spline_HbO + n_MA_Spline;
@@ -191,14 +227,20 @@ for folder = 4:length(Subfolders)
                     n_Wavelet_HbO           =   n_Spline_HbO + n_MA_Wavelet;
                     [n_MA_Kalman,~,~]       =   CalMotionArtifact(tIncAuto_Kalman(stim_start:512,Ch));
                     n_Kalman_HbO            =   n_Spline_HbO + n_MA_Kalman;
-                    [n_MA_PCA,~,~]          =   CalMotionArtifact(tIncAuto_PCA(stim_start:512,Ch));
-                    n_PCA_HbO               =   n_PCA_HbO + n_MA_PCA;
+                    [n_MA_PCA97,~,~]        =   CalMotionArtifact(tIncAuto_PCA97(stim_start:512,Ch));
+                    n_PCA97_HbO             =   n_PCA97_HbO + n_MA_PCA97;
+                    [n_MA_PCA80,~,~]        =   CalMotionArtifact(tIncAuto_PCA80(stim_start:512,Ch));
+                    n_PCA80_HbO             =   n_PCA80_HbO + n_MA_PCA80;
+                    [n_MA_Cbsi,~,~]         =   CalMotionArtifact(tIncAuto_Cbsi(stim_start:512,Ch));
+                    n_Cbsi_HbO              =   n_Cbsi_HbO + n_MA_Cbsi;
                 else
                     Real_HbR(end+1,:)       =   squeeze(dc(stim_start:512,2,Ch-36)); 
                     HbR_Spline(end+1,:)     =   squeeze(dc_Spline(stim_start:512,2,Ch-36));
                     HbR_Wavelet(end+1,:)    =   squeeze(dc_Wavelet(stim_start:512,2,Ch-36));
                     HbR_Kalman(end+1,:)     =   squeeze(dc_Kalman(stim_start:512,2,Ch-36));
-                    HbR_PCA(end+1,:)        =   squeeze(dc_PCA(stim_start:512,2,Ch-36));
+                    HbR_PCA80(end+1,:)      =   squeeze(dc_PCA80(stim_start:512,2,Ch-36));
+                    HbR_PCA97(end+1,:)      =   squeeze(dc_PCA97(stim_start:512,2,Ch-36));
+                    HbR_Cbsi(end+1,:)       =   squeeze(dc_Cbsi(stim_start:512,2,Ch-36));
                     % save the number of trials left
                     [n_MA_Spline,~,~]       =   CalMotionArtifact(tIncChAuto_after_Spline(stim_start:512,Ch));
                     n_Spline_HbR            =   n_Spline_HbR + n_MA_Spline;
@@ -206,8 +248,12 @@ for folder = 4:length(Subfolders)
                     n_Wavelet_HbR           =   n_Spline_HbR + n_MA_Wavelet;
                     [n_MA_Kalman,~,~]       =   CalMotionArtifact(tIncAuto_Kalman(stim_start:512,Ch));
                     n_Kalman_HbR            =   n_Spline_HbR + n_MA_Kalman;
-                    [n_MA_PCA,~,~]          =   CalMotionArtifact(tIncAuto_PCA(stim_start:512,Ch));
-                    n_PCA_HbR               =   n_PCA_HbR + n_MA_PCA;
+                    [n_MA_PCA97,~,~]        =   CalMotionArtifact(tIncAuto_PCA97(stim_start:512,Ch));
+                    n_PCA97_HbR             =   n_PCA97_HbR + n_MA_PCA97;
+                    [n_MA_PCA80,~,~]        =   CalMotionArtifact(tIncAuto_PCA97(stim_start:512,Ch));
+                    n_PCA80_HbR             =   n_PCA80_HbR + n_MA_PCA80;
+                    [n_MA_Cbsi,~,~]         =   CalMotionArtifact(tIncAuto_Cbsi(stim_start:512,Ch));
+                    n_Cbsi_HbO              =   n_Cbsi_HbO + n_MA_Cbsi;
                 end
                     % and the HRF height without motion artifact
             end
@@ -220,47 +266,38 @@ pd_HbR = fitdist(diff_HbR_list','gamma');
 
 histogram(diff_HbO_list);hold on;
 % simu = gamrnd(pd_HbO.a,pd_HbO.b,1500,1);
-title('HbO')
+title('dist. of peak/shift distance in HbO')
 
 figure
 histogram(diff_HbR_list);hold on;
-title('HbR')
+title('dist. of peak/shift distance in HbR')
 
 figure
 histogram(n_MA_HbO_list);hold on;
-title('HbO')
+title('dist. of No. of motion artifact for HbO')
 
 figure
 histogram(n_MA_HbR_list);hold on;
-title('HbR')
+title('dist. of No. of motion artifact for HbR')
 %%
 n_MA_total_HbO = sum(n_MA_HbO_list);
 n_MA_total_HbR = sum(n_MA_HbR_list);
-MA_list = [n_MA_total_HbO,n_Spline_HbO,n_Wavelet_HbO,n_Kalman_HbO,n_PCA_HbO;...
-    n_MA_total_HbR,n_Spline_HbR,n_Wavelet_HbR,n_Kalman_HbR,n_PCA_HbR];
+MA_list = [n_MA_total_HbO,n_Spline_HbO,n_Wavelet_HbO,n_Kalman_HbO,n_PCA97_HbO,n_PCA80_HbO;...
+    n_MA_total_HbR,n_Spline_HbR,n_Wavelet_HbR,n_Kalman_HbR,n_PCA97_HbR,n_PCA80_HbR];
 %% save
-save('Processed_data/Real_HbO.mat')
-save('Processed_data/HbO_Spline.mat')
-save('Processed_data/HbO_Wavelet.mat')
-save('Processed_data/HbO_Kalman.mat')
-save('Processed_data/HbO_PCA.mat')
+save('Processed_data/Real_HbO.mat','Real_HbO')
+save('Processed_data/HbO_Spline.mat','Spline')
+save('Processed_data/HbO_Wavelet.mat','Wavelet')
+save('Processed_data/HbO_Kalman.mat','Kalman')
+save('Processed_data/HbO_PCA97.mat','HbO_PCA97')
+save('Processed_data/HbO_PCA80.mat','HbO_PCA80')
 
-save('Processed_data/Real_HbR.mat')
-save('Processed_data/HbR_Spline.mat')
-save('Processed_data/HbR_Wavelet.mat')
-save('Processed_data/HbR_Kalman.mat')
-save('Processed_data/HbR_PCA.mat')
+save('Processed_data/Real_HbR.mat','Real_HbR')
+save('Processed_data/HbR_Spline.mat','HbR_Spline')
+save('Processed_data/HbR_Wavelet.mat','HbR_Wavelet')
+save('Processed_data/HbR_Kalman.mat','HbR_Kalman')
+save('Processed_data/HbR_PCA97.mat','HbR_PCA97')
+save('Processed_data/HbR_PCA80.mat','HbR_PCA80')
 
-save('Processed_data/MA_list.mat')
+save('Processed_data/MA_list.mat','MA_list')
 %% functions
-function [n_MA,runstarts,runends] = CalMotionArtifact(tIncChAuto)
-
-transitions = diff([0; tIncChAuto == 0; 0]);
-runstarts = find(transitions == 1);
-runends = find(transitions == -1);
-if isempty(runstarts)
-    n_MA = 0;
-else
-    n_MA = length(runstarts);
-end
-end

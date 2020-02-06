@@ -1,4 +1,5 @@
 %Plot Motion artifact removal results on experimental data by conventional methods
+
 function Plot_MAR_results()
 clear all
 clc
