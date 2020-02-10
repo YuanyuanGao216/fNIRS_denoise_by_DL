@@ -1,2 +1,6 @@
 *.m~
 *.mat
+*.txt
+*.fig
+*.png
+*.hdf5
