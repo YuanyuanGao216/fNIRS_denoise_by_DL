@@ -16,6 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import math
 from keras import optimizers
 import scipy.io
+from sklearn import preprocessing
 # %% data genetator
 def TrainGenerator(train_x,train_y):
     x_size = len(train_x)
@@ -68,6 +69,7 @@ def ValGenerator(train_x,train_y):
         batch_start += 1
         yield (x, y)
 # %% model arch
+
 def L4_arch():
     fNIRS_input = Input(shape = (512,1))
     
@@ -198,9 +200,32 @@ X_real_HbO = scipy.io.loadmat('Processed_data/Real_HbO.mat')
 X_real_HbO = X_real_HbO['Real_HbO'];
 X_real_HbR = scipy.io.loadmat('Processed_data/Real_HbR.mat')
 X_real_HbR = X_real_HbR['Real_HbR'];
-X_real = np.concatenate((X_real_HbO,X_real_HbR), axis=0)
+X_real = np.concatenate((X_real_HbO,X_real_HbR),axis = 0)
+X = X*1000000
+Y = Y*1000000
+X_real = X_real*1000000
+# %%
 
 SampleSize = X.shape[0]
+
+n_train = np.int16(SampleSize*0.8)
+
+index = np.random.permutation(SampleSize)
+X_train = X[index[0:n_train],:]
+Y_train = Y[index[0:n_train],:]
+X_val = X[index[n_train:],:]
+Y_val = Y[index[n_train:],:]
+
+#X_train = preprocessing.normalize(X_train)
+
+
+X_train = X_train[:,:,np.newaxis]
+X_val = X_val[:,:,np.newaxis]
+Y_train = Y_train[:,:,np.newaxis]
+Y_val = Y_val[:,:,np.newaxis]
+X_test = X_real[:,:,np.newaxis]
+
+# %%
 for model_name in model:
     
     print('Model:', model_name)
@@ -212,32 +237,16 @@ for model_name in model:
         network = L8_arch()
     elif model_name == '8layers+dropout':
         network = L8_dropout_arch()
+#    elif model_name == 'try':
+#        network = try_arch()
     network.summary()
-    
-    n_train = np.int16(SampleSize*0.8)
-    n_val = np.int16(SampleSize*0.2)
-    
-    index = np.random.permutation(SampleSize)
-    X_train = X[index[0:n_train],:]
-    Y_train = Y[index[0:n_train],:]
-    X_val = X[index[n_train:n_train+n_val],:]
-    Y_val = Y[index[n_train:n_train+n_val],:]
-
-    
-    X_train = X_train[:,:,np.newaxis]
-    X_val = X_val[:,:,np.newaxis]
-    Y_train = Y_train[:,:,np.newaxis]
-    Y_val = Y_val[:,:,np.newaxis]
-    X_test = X_real[:,:,np.newaxis]
-    
     hdf5_filepath = "networks\\" + model_name+".hdf5"
     save_model = ModelCheckpoint(hdf5_filepath,monitor='val_loss',save_best_only=True,mode = 'min')
-    learning_rate = 0.00001
+    learning_rate = 0.001
     opt = optimizers.Adam(lr = learning_rate)
-    network.compile(loss = 'mean_squared_error',
-                optimizer = opt)
+    network.compile(loss = 'mean_squared_error', optimizer = opt)
     def step_decay(epoch):
-       initial_lrate = 0.00001
+       initial_lrate = 0.0000000001
        drop = 0.5
        epochs_drop = 100.0
        lrate = initial_lrate * math.pow(drop,math.floor((1+epoch)/epochs_drop))
@@ -245,16 +254,18 @@ for model_name in model:
     lr_rate_schedule = LearningRateScheduler(step_decay)
     hist = network.fit_generator(TrainGenerator(np.asarray(X_train),np.asarray(Y_train)),
              steps_per_epoch = 16,
-             epochs = 1000,
+             epochs = 500,
              verbose = 2,
              validation_data = ValGenerator(np.array(X_val),np.array(Y_val)),
              validation_steps=16,
-             callbacks = [save_model,lr_rate_schedule])
+             callbacks = [save_model])
     losses = hist.history
-    loss_history = hist.history["loss"]
-    numpy_loss_history = np.array(loss_history)
+    numpy_loss_history = np.array(losses['loss'])
+    val_numpy_loss_history = np.array(losses['val_loss'])
     losspath = "Processed_data\\loss_" + model_name+".txt"
+    val_losspath = "Processed_data\\val_loss_" + model_name+".txt"
     np.savetxt(losspath, numpy_loss_history, delimiter=",")
+    np.savetxt(val_losspath, val_numpy_loss_history, delimiter=",")
     
     plt.figure()
     vl, = plt.plot(losses['val_loss'],'r')

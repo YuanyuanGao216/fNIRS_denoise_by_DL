@@ -4,7 +4,8 @@ clear all
 load('Processed_data/simulated_HbO.mat','simulated_HbO')
 load('Processed_data/simulated_HbR.mat','simulated_HbR')
 load('Processed_data/pds.mat')
-
+load('Processed_data/Real_HbO.mat')
+load('Processed_data/Real_HbR.mat')
 %%
 % simu = gamrnd(pd_HbO.a,pd_HbO.b,1500,1);
 % figure
@@ -73,7 +74,21 @@ for i = 1:length(Resting_matrix)
     HRF_profile(i,:) = HRF;
 end
 %% save
+%% find outliers
+HRF_sum = sum(noised_HRF_matrix,2);
+Real_HbO_sum = sum(Real_HbO,2);
+Real_HbR_sum = sum(Real_HbR,2);
+thres = max([max(abs(Real_HbO_sum)),max(abs(Real_HbR_sum))]);
+index = find(abs(HRF_sum)>thres);
+noised_HRF_matrix(index,:) = [];
+noise_profile(index,:) = [];
+HRF_profile(index,:) = [];
 
-save('Process_data/noise_profile.mat','noise_profile')
-save('Process_data/HRF_profile.mat','HRF_profile')%output
-save('Process_data/noised_HRF_matrix.mat','noised_HRF_matrix')%input
+%% plot
+HRF_sum = sum(noised_HRF_matrix,2);
+figure
+plot(HRF_sum)
+%% save
+save('Processed_data/noise_profile.mat','noise_profile')
+save('Processed_data/HRF_profile.mat','HRF_profile')%output
+save('Processed_data/noised_HRF_matrix.mat','noised_HRF_matrix')%input
