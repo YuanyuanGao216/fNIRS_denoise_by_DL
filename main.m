@@ -4,6 +4,6 @@ clc
 
 [pd_HbO,pd_HbR] = MA_HRF_character;
 SimulateData
-SimulateMotionArtifacts(pd_HbO,pd_HbR);
+SimulateMotionArtifacts;
 BuildRealData
 Plot_Results

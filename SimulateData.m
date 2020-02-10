@@ -5,11 +5,13 @@ clear all
 clc
 close all
 seed = 101;
+rng(seed)
+STD = 10;
 
 %% noise
 % load the fNIRS data
 %----------------add homer2 path----------------------------------
-pathHomer = '/Users/gaoyuanyuan/Dropbox/Cemsim/Studies/Tools/homer2_src_v2_3_10202017';
+pathHomer = '../../Tools/homer2_src_v2_3_10202017';
 oldpath = cd(pathHomer);
 setpaths;
 cd(oldpath);
@@ -18,7 +20,7 @@ simulated_HbO = [];
 simulated_HbR = [];
 
 % loop subfolders and files
-DataDir = '/Users/gaoyuanyuan/Dropbox/Cemsim/Studies/Buffalo_study/Raw_Data/Study_#2';
+DataDir = '../../Buffalo_study/Raw_Data/Study_#2';
 Subfolders = dir(DataDir);
 for folder = 4:length(Subfolders)
     name = Subfolders(folder).name;
@@ -43,7 +45,7 @@ for folder = 4:length(Subfolders)
         %% standard processing wo correction
         SD              =   enPruneChannels(d,SD,tIncMan,[0.01 10],2,[0  45],0);
         dod             =   hmrIntensity2OD(d);
-        [~,tIncChAuto]  =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,30,200);
+        [~,tIncChAuto]  =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,200);
         dod             =   hmrBandpassFilt(dod,t,0,0.5);
         dc              =   hmrOD2Conc(dod,SD,[6  6]);
         %% select period outside trials and fit AR(5) model, simulate new data
@@ -123,7 +125,6 @@ for folder = 4:length(Subfolders)
         end
     end
 end
-% fprintf('How many resting period? %d\n',size(simulated_HbR,1))
 save('Processed_data/simulated_HbO.mat','simulated_HbO')
 save('Processed_data/simulated_HbR.mat','simulated_HbR')
 
