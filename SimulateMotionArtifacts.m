@@ -68,21 +68,35 @@ for i = 1:length(Resting_matrix)
         amp_Hb = gamrnd(pd_HRF_HbR.a,pd_HRF_HbR.b,1,1);
         HRF = -amp_Hb./gamma(t/15/fs);
     end
+    if i <= length(simulated_HbO)
+        drift_Hb = normrnd(pd_start_HRF_HbO.mu,pd_start_HRF_HbO.sigma,1,1);
+    else
+        drift_Hb = normrnd(pd_start_HRF_HbR.mu,pd_start_HRF_HbO.sigma,1,1);
+    end
+    HRF = HRF + drift_Hb;
     noised_HRF = Resting + HRF + noise;
     noised_HRF_matrix(i,:) = noised_HRF;
     noise_profile(i,:) = noise;
     HRF_profile(i,:) = HRF;
 end
-%% save
+
 %% find outliers
-HRF_sum = sum(noised_HRF_matrix,2);
+[m,n] = size(noised_HRF_matrix);
+noised_HbO = noised_HRF_matrix(1:m/2,:);
+noised_HbR = noised_HRF_matrix(m/2+1:end,:);
+noised_HbO_sum = sum(noised_HbO,2);
+noised_HbR_sum = sum(noised_HbR,2);
 Real_HbO_sum = sum(Real_HbO,2);
 Real_HbR_sum = sum(Real_HbR,2);
-thres = max([max(abs(Real_HbO_sum)),max(abs(Real_HbR_sum))]);
-index = find(abs(HRF_sum)>thres);
-noised_HRF_matrix(index,:) = [];
-noise_profile(index,:) = [];
-HRF_profile(index,:) = [];
+thres_HbO = max(abs(Real_HbO_sum));
+thres_HbR = max(abs(Real_HbR_sum));
+
+index_HbO = find(abs(noised_HbO_sum)>thres_HbO);
+index_HbR = find(abs(noised_HbR_sum)>thres_HbR);
+
+noised_HRF_matrix([index_HbO;index_HbR+m/2],:) = [];
+noise_profile([index_HbO;index_HbR+m/2],:) = [];
+HRF_profile([index_HbO;index_HbR+m/2],:) = [];
 
 %% plot
 HRF_sum = sum(noised_HRF_matrix,2);
