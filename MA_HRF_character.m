@@ -4,7 +4,6 @@
 % Extract motion artifact peak distribution and HRF peak values
 % distribution
 % what does motion artifact look like in the real data?
-% function [pd_HbO,pd_HbR] = MA_HRF_character()
 
 clear all
 clc
@@ -55,14 +54,14 @@ STD = 10;
 %% load fNIRS file
 % loop subfolders and files
 if ispc
-    DataDir = 'C:\Users\Yvonne\Dropbox\Cemsim\Studies\Buffalo_study\Raw_Data\Study_#2';
+    DataDir = '..\..\Buffalo_study\Raw_Data\Study_#2';
 else
-    DataDir = '/Users/gaoyuanyuan/Dropbox/Cemsim/Studies/Buffalo_study/Raw_Data/Study_#2';
+    DataDir = '../../Buffalo_study/Raw_Data/Study_#2';
 end
 Subfolders = dir(DataDir);
 for folder = 4:length(Subfolders)
     name = Subfolders(folder).name;
-    if strcmp(name,'L8')
+    if strcmp(name,'L8') % L8 dropped out of the study and his data is not complete
         continue
     end
     fprintf('subject is %s\n',name);
@@ -187,8 +186,7 @@ for folder = 4:length(Subfolders)
                 end
                 if Ch < 36
                     % save the 0-65s data
-                    dc_data = squeeze(dc(stim_start:stim_start+512-1,1,Ch)); 
-                    Real_HbO(end+1,:)       =   dc_data; 
+                    dc_data = squeeze(dc(stim_start:stim_start+512-1,1,Ch));  
                     tInc                    =   tIncChAuto(stim_start:stim_start+512-1,Ch);
                     Real_HbO_wo_MA          =   dc_data(find(tInc==1)); 
                     HRF_HbO_list(end+1)     =   max(Real_HbO_wo_MA)-min(Real_HbO_wo_MA);
@@ -257,45 +255,48 @@ pd_start_HRF_HbR = fitdist(Start_HRF_HbR_list','Normal');
 
 save('Processed_data/pds.mat','pd_diff_HbO','pd_diff_HbR','pd_n_HbO','pd_n_HbR','pd_HRF_HbO','pd_HRF_HbR',...
 'pd_start_HRF_HbO','pd_start_HRF_HbR');
+save('Processed_data/list.mat','diff_HbO_list','diff_HbR_list',...
+    'n_MA_HbO_list','n_MA_HbR_list',...
+    'HRF_HbO_list','HRF_HbR_list',...
+    'Start_HRF_HbO_list','Start_HRF_HbR_list');
 figure
 histogram(diff_HbO_list);hold on;
-% simu = gamrnd(pd_HbO.a,pd_HbO.b,1500,1);
-title('dist. of peak/shift distance in HbO')
+title('Dist. of peak/shift distance in HbO')
 savefig('Figures/dist. of peakshift distance in HbO.fig')
 
 figure
 histogram(diff_HbR_list);hold on;
-title('dist. of peak/shift distance in HbR')
+title('Dist. of peak/shift distance in HbR')
 savefig('Figures/dist. of peakshift distance in HbR.fig')
 
 figure
 histogram(n_MA_HbO_list);hold on;
-title('dist. of No. of motion artifact for HbO')
+title('Dist. of No. of motion artifact for HbO')
 savefig('Figures/dist. of No. of motion artifact for HbO.fig')
 
 figure
 histogram(n_MA_HbR_list);hold on;
-title('dist. of No. of motion artifact for HbR')
+title('Dist. of No. of motion artifact for HbR')
 savefig('Figures/dist. of No. of motion artifact for HbR.fig')
 
 figure
 histogram(HRF_HbO_list);
-title('dist. of HRF change in HbO')
+title('Dist. of HRF change in HbO')
 savefig('Figures/dist. of HRF change in HbO.fig')
 
 figure
 histogram(HRF_HbR_list);
-title('dist. of HRF change in HbR')
+title('Dist. of HRF change in HbR')
 savefig('Figures/dist. of HRF change in HbO.fig')
 
 figure
 histogram(Start_HRF_HbO_list);
-title('dist. of HRF start in HbO')
+title('Dist. of HRF start in HbO')
 savefig('Figures/dist. of HRF start in HbO.fig')
 
 figure
 histogram(Start_HRF_HbR_list);
-title('dist. of HRF start in HbR')
+title('Dist. of HRF start in HbR')
 savefig('Figures/dist. of HRF start in HbO.fig')
 
 %%
