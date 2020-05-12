@@ -57,7 +57,7 @@ plot(HbO_PCA99(piece,:),'color','m','linestyle','-.','DisplayName','PCA99','Line
 plot(HbO_PCA50(piece,:),'color','c','linestyle','-.','DisplayName','PCA50','LineWidth',1.5);hold on;
 plot(HbO_Cbsi(piece,:),'Color',[153, 102, 51]./255,'linestyle','-.','DisplayName','Cbsi','LineWidth',1.5);hold on;
 plot(HbO_NN(piece,:),'color','r','linestyle','-.','DisplayName','DAE','LineWidth',1.5);hold on;
-ylabel('/delta HbO (/muMol)')
+ylabel('\Delta HbO (Mol)')
 fs = 7.8125;
 xticks([0 20 40 60]*fs)
 xticklabels({'0s','20s','40s','60s'})
@@ -75,7 +75,7 @@ plot(HbR_PCA99(piece,:),'color','m','linestyle','-.','DisplayName','PCA99','Line
 plot(HbR_PCA50(piece,:),'color','c','linestyle','-.','DisplayName','PCA50','LineWidth',1.5);hold on;
 plot(HbR_Cbsi(piece,:),'Color',[153, 102, 51]./255,'linestyle','-.','DisplayName','Cbsi','LineWidth',1.5);hold on;
 plot(HbR_NN(piece,:),'color','r','linestyle','-.','DisplayName','DAE','LineWidth',1.5);hold on;
-ylabel('/delta HbR (/muMol)')
+ylabel('\Delta HbR (Mol)')
 fs = 7.8125;
 xticks([0 20 40 60]*fs) 
 xticklabels({'0s','20s','40s','60s'})
@@ -234,14 +234,13 @@ MA_list = [n_MA_total_HbO,n_Spline_HbO,n_Wavelet05_HbO,n_Wavelet40_HbO,n_Kalman_
 
 
 figure
-b = bar(MA_list(1,:),'facecolor',[70 116 193]./256);
+b = bar(MA_list(1,:),'facecolor',[108, 171, 215]./256);
 
 ylabel('No. of Motion Artifacts')
 set(gca, 'XTick', 1:size(MA_list,2),'fontsize',12)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels)
-xtickangle(45)
-set(gcf,'Position',[465   440   368   215]);
+xtickangle(90)
 ylim([0 600])
 xlim([0 10])
 
@@ -250,53 +249,61 @@ ytips1 = b(1).YEndPoints;
 labels1 = string(b(1).YData);
 text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
     'VerticalAlignment','bottom')
+set(gcf,'Position',[3   490   330   215]);
+ax = gca;
+ax.XGrid = 'off';
+ax.YGrid = 'on';
+b.EdgeColor = [1 1 1];
+b.FaceColor = 'flat';
+b.CData(9,:) = [200, 14, 80]./255;
+box off
 fprintf('%d\n',MA_list(1,end))
 MA_list(1,:)
-%% boxplot for AUC0-2, AUCratio 
+%% boxplot for AUC0-18, AUCratio = AUC0-18/AUC18-26 
 % AUC0-2
 AUC0_2_HbO = zeros(9,size(Real_HbO,1));
-AUC0_2_HbO(1,:) = abs(trapz(Real_HbO(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(2,:) = abs(trapz(HbO_Spline(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(5,:) = abs(trapz(HbO_Kalman(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(6,:) = abs(trapz(HbO_PCA99(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(7,:) = abs(trapz(HbO_PCA50(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(8,:) = abs(trapz(HbO_Cbsi(:,1:round(fs*2))./fs,2));
-AUC0_2_HbO(9,:) = abs(trapz(HbO_NN(:,1:round(fs*2))./fs,2));
+AUC0_2_HbO(1,:) = abs(trapz(Real_HbO(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(2,:) = abs(trapz(HbO_Spline(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(5,:) = abs(trapz(HbO_Kalman(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(6,:) = abs(trapz(HbO_PCA99(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(7,:) = abs(trapz(HbO_PCA50(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(8,:) = abs(trapz(HbO_Cbsi(:,1:round(fs*18))./fs,2));
+AUC0_2_HbO(9,:) = abs(trapz(HbO_NN(:,1:round(fs*18))./fs,2));
 
 AUC0_2_HbR = zeros(9,size(Real_HbO,1));
-AUC0_2_HbR(1,:) = abs(trapz(Real_HbR(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(2,:) = abs(trapz(HbR_Spline(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(5,:) = abs(trapz(HbR_Kalman(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(6,:) = abs(trapz(HbR_PCA99(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(7,:) = abs(trapz(HbR_PCA50(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(8,:) = abs(trapz(HbR_Cbsi(:,1:round(fs*2))./fs,2));
-AUC0_2_HbR(9,:) = abs(trapz(HbR_NN(:,1:round(fs*2))./fs,2));
+AUC0_2_HbR(1,:) = abs(trapz(Real_HbR(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(2,:) = abs(trapz(HbR_Spline(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(5,:) = abs(trapz(HbR_Kalman(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(6,:) = abs(trapz(HbR_PCA99(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(7,:) = abs(trapz(HbR_PCA50(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(8,:) = abs(trapz(HbR_Cbsi(:,1:round(fs*18))./fs,2));
+AUC0_2_HbR(9,:) = abs(trapz(HbR_NN(:,1:round(fs*18))./fs,2));
 % AUC 2-4
 AUC2_4_HbO = zeros(9,size(Real_HbO,1));
-AUC2_4_HbO(1,:) = abs(trapz(Real_HbO(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(2,:) = abs(trapz(HbO_Spline(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(5,:) = abs(trapz(HbO_Kalman(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(6,:) = abs(trapz(HbO_PCA99(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(7,:) = abs(trapz(HbO_PCA50(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(8,:) = abs(trapz(HbO_Cbsi(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbO(9,:) = abs(trapz(HbO_NN(:,round(fs*2):round(fs*4))./fs,2));
+AUC2_4_HbO(1,:) = abs(trapz(Real_HbO(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(2,:) = abs(trapz(HbO_Spline(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(5,:) = abs(trapz(HbO_Kalman(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(6,:) = abs(trapz(HbO_PCA99(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(7,:) = abs(trapz(HbO_PCA50(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(8,:) = abs(trapz(HbO_Cbsi(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbO(9,:) = abs(trapz(HbO_NN(:,round(fs*18):round(fs*26))./fs,2));
 
 AUC2_4_HbR = zeros(9,size(Real_HbO,1));
-AUC2_4_HbR(1,:) = abs(trapz(Real_HbR(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(2,:) = abs(trapz(HbR_Spline(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(5,:) = abs(trapz(HbR_Kalman(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(6,:) = abs(trapz(HbR_PCA99(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(7,:) = abs(trapz(HbR_PCA50(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(8,:) = abs(trapz(HbR_Cbsi(:,round(fs*2):round(fs*4))./fs,2));
-AUC2_4_HbR(9,:) = abs(trapz(HbR_NN(:,round(fs*2):round(fs*4))./fs,2));
+AUC2_4_HbR(1,:) = abs(trapz(Real_HbR(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(2,:) = abs(trapz(HbR_Spline(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(5,:) = abs(trapz(HbR_Kalman(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(6,:) = abs(trapz(HbR_PCA99(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(7,:) = abs(trapz(HbR_PCA50(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(8,:) = abs(trapz(HbR_Cbsi(:,round(fs*18):round(fs*26))./fs,2));
+AUC2_4_HbR(9,:) = abs(trapz(HbR_NN(:,round(fs*18):round(fs*26))./fs,2));
 
 % AUC ratio
 AUCratio_HbO = AUC2_4_HbO./AUC0_2_HbO;
@@ -305,7 +312,7 @@ AUCratio_HbR = AUC2_4_HbR./AUC0_2_HbR;
 figure
 subplot(2,2,1)
 boxplot(AUC0_2_HbO','colors','k','OutlierSize',2,'Symbol','b.')
-title('AUC0-2 HbO')
+title('AUC0-18 HbO')
 set(gca, 'XTick', 1:size(AUC0_2_HbO,1),'fontsize',12)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels)
@@ -322,7 +329,7 @@ xtickangle(90)
 
 subplot(2,2,3)
 boxplot(AUC0_2_HbR','colors','k','OutlierSize',2,'Symbol','b.')
-title('AUC0-2 HbR')
+title('AUC0-18 HbR')
 set(gca, 'XTick',1:size(AUC0_2_HbO,1),'fontsize',12)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels)
@@ -339,7 +346,7 @@ xtickangle(90)
 ylim([0 15])
 %% 
 [p,~,stats] = anova1(AUC0_2_HbR');
-[c,m,h,nms] = multcompare(stats,'Display','off');
+[c,m,h,nms] = multcompare(stats,'Display','on');
 
 
 %% figure 4 dot plot contrast
@@ -415,7 +422,7 @@ for i = 1:8
     subplot(4,2,i)
     x_data = AUCratio_HbO(1,:);
     y_data = AUCratio_HbO(i+1,:);
-    plot(x_data,y_data,'bx');hold on;
+    loglog(x_data,y_data,'bx');hold on;
     axis square
     n1 = sum(y_data>x_data);
     n2 = sum(y_data<x_data);
@@ -448,7 +455,7 @@ for i = 1:8
     subplot(4,2,i)
     x_data = AUCratio_HbR(1,:);
     y_data = AUCratio_HbR(i+1,:);
-    plot(x_data,y_data,'bx');hold on;
+    loglog(x_data,y_data,'bx');hold on;
     axis square
     n1 = sum(y_data>x_data);
     n2 = sum(y_data<x_data);
@@ -475,3 +482,226 @@ for i = 1:8
 end
 
 set(gcf,'Position',[350 10 300 650])
+% %% boxplot for AUC0-2, AUCratio 
+% % AUC0-2
+% AUC0_2_HbO = zeros(9,size(Real_HbO,1));
+% AUC0_2_HbO(1,:) = abs(trapz(Real_HbO(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(2,:) = abs(trapz(HbO_Spline(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(5,:) = abs(trapz(HbO_Kalman(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(6,:) = abs(trapz(HbO_PCA99(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(7,:) = abs(trapz(HbO_PCA50(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(8,:) = abs(trapz(HbO_Cbsi(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbO(9,:) = abs(trapz(HbO_NN(:,1:round(fs*2))./fs,2));
+% 
+% AUC0_2_HbR = zeros(9,size(Real_HbO,1));
+% AUC0_2_HbR(1,:) = abs(trapz(Real_HbR(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(2,:) = abs(trapz(HbR_Spline(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(5,:) = abs(trapz(HbR_Kalman(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(6,:) = abs(trapz(HbR_PCA99(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(7,:) = abs(trapz(HbR_PCA50(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(8,:) = abs(trapz(HbR_Cbsi(:,1:round(fs*2))./fs,2));
+% AUC0_2_HbR(9,:) = abs(trapz(HbR_NN(:,1:round(fs*2))./fs,2));
+% % AUC 2-4
+% AUC2_4_HbO = zeros(9,size(Real_HbO,1));
+% AUC2_4_HbO(1,:) = abs(trapz(Real_HbO(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(2,:) = abs(trapz(HbO_Spline(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(3,:) = abs(trapz(HbO_Wavelet05(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(4,:) = abs(trapz(HbO_Wavelet40(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(5,:) = abs(trapz(HbO_Kalman(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(6,:) = abs(trapz(HbO_PCA99(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(7,:) = abs(trapz(HbO_PCA50(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(8,:) = abs(trapz(HbO_Cbsi(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbO(9,:) = abs(trapz(HbO_NN(:,round(fs*2):round(fs*4))./fs,2));
+% 
+% AUC2_4_HbR = zeros(9,size(Real_HbO,1));
+% AUC2_4_HbR(1,:) = abs(trapz(Real_HbR(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(2,:) = abs(trapz(HbR_Spline(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(3,:) = abs(trapz(HbR_Wavelet05(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(4,:) = abs(trapz(HbR_Wavelet40(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(5,:) = abs(trapz(HbR_Kalman(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(6,:) = abs(trapz(HbR_PCA99(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(7,:) = abs(trapz(HbR_PCA50(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(8,:) = abs(trapz(HbR_Cbsi(:,round(fs*2):round(fs*4))./fs,2));
+% AUC2_4_HbR(9,:) = abs(trapz(HbR_NN(:,round(fs*2):round(fs*4))./fs,2));
+% 
+% % AUC ratio
+% AUCratio_HbO = AUC2_4_HbO./AUC0_2_HbO;
+% AUCratio_HbR = AUC2_4_HbR./AUC0_2_HbR;
+% 
+% figure
+% subplot(2,2,1)
+% boxplot(AUC0_2_HbO','colors','k','OutlierSize',2,'Symbol','b.')
+% title('AUC0-2 HbO')
+% set(gca, 'XTick', 1:size(AUC0_2_HbO,1),'fontsize',12)
+% set(gca, 'FontName', 'Arial')
+% set(gca, 'XTickLabel', labels)
+% xtickangle(90)
+% ylabel('\muMol*s')
+% 
+% subplot(2,2,2)
+% boxplot(AUCratio_HbO','colors','k','OutlierSize',2,'Symbol','b.')
+% title('AUCratio HbO')
+% set(gca, 'XTick',1:size(AUC0_2_HbO,1),'fontsize',12)
+% set(gca, 'FontName', 'Arial')
+% set(gca, 'XTickLabel', labels)
+% xtickangle(90)
+% 
+% subplot(2,2,3)
+% boxplot(AUC0_2_HbR','colors','k','OutlierSize',2,'Symbol','b.')
+% title('AUC0-2 HbR')
+% set(gca, 'XTick',1:size(AUC0_2_HbO,1),'fontsize',12)
+% set(gca, 'FontName', 'Arial')
+% set(gca, 'XTickLabel', labels)
+% xtickangle(90)
+% ylabel('\muMol*s')
+% 
+% subplot(2,2,4)
+% boxplot(AUCratio_HbR','colors','k','OutlierSize',2,'Symbol','b.')
+% title('AUCratio HbR')
+% set(gca, 'XTick', 1:size(AUC0_2_HbO,1),'fontsize',12)
+% set(gca, 'FontName', 'Arial')
+% set(gca, 'XTickLabel', labels)
+% xtickangle(90)
+% ylim([0 15])
+% %% 
+% [p,~,stats] = anova1(AUC0_2_HbR');
+% [c,m,h,nms] = multcompare(stats,'Display','off');
+% 
+% 
+% %% figure 4 dot plot contrast
+% fontsize = 12;
+% figure
+% for i = 1:8
+%     subplot(4,2,i)
+%     x_data = AUC0_2_HbO(1,:);
+%     y_data = AUC0_2_HbO(i+1,:);
+%     plot(x_data,y_data,'bx');hold on;
+%     axis square
+%     n1 = sum(y_data>x_data);
+%     n2 = sum(y_data<x_data);
+%     n = size(x_data,2);
+%     n1 = n1/n;
+%     n2 = n2/n;
+%     min_data = min([min(x_data),min(y_data)]);
+%     max_data = max([max(x_data),max(y_data)]);
+%     plot([min_data,max_data],[min_data,max_data],'r-')
+%     xlim([min_data max_data])
+%     ylim([min_data max_data])
+%     xl = xlim;
+%     yl = ylim;
+%     n1_x = xl(1)+(xl(2)-xl(1))*1/4-(xl(2)-xl(1))*1/8;
+%     n1_y = (yl(1)+(yl(2)-yl(1))*3/4);
+%     n1_str = sprintf('%.2f%%',n1*100);
+%     text(n1_x,n1_y,n1_str);
+%     n2_x = (xl(1)+(xl(2)-xl(1))*3/4)-(xl(2)-xl(1))*1/8;
+%     n2_y = (yl(1)+(yl(2)-yl(1))*1/4);
+%     n2_str = sprintf('%.2f%%',n2*100);
+%     text(n2_x,n2_y,n2_str)
+%     xlabel('No correction','FontSize', fontsize)
+%     ylabel(labels{i+1},'FontSize', fontsize)
+% end
+% 
+% set(gcf,'Position',[30 10 300 650])
+% 
+% figure
+% for i = 1:8
+%     subplot(4,2,i)
+%     x_data = AUC0_2_HbR(1,:);
+%     y_data = AUC0_2_HbR(i+1,:);
+%     plot(x_data,y_data,'bx');hold on;
+%     axis square
+%     n1 = sum(y_data>x_data);
+%     n2 = sum(y_data<x_data);
+%     n = size(x_data,2);
+%     n1 = n1/n;
+%     n2 = n2/n;
+%     min_data = min([min(x_data),min(y_data)]);
+%     max_data = max([max(x_data),max(y_data)]);
+%     plot([min_data,max_data],[min_data,max_data],'r-')
+%     xlim([min_data max_data])
+%     ylim([min_data max_data])
+%     xl = xlim;
+%     yl = ylim;
+%     n1_x = xl(1)+(xl(2)-xl(1))*1/4-(xl(2)-xl(1))*1/8;
+%     n1_y = (yl(1)+(yl(2)-yl(1))*3/4);
+%     n1_str = sprintf('%.2f%%',n1*100);
+%     text(n1_x,n1_y,n1_str);
+%     n2_x = (xl(1)+(xl(2)-xl(1))*3/4)-(xl(2)-xl(1))*1/8;
+%     n2_y = (yl(1)+(yl(2)-yl(1))*1/4);
+%     n2_str = sprintf('%.2f%%',n2*100);
+%     text(n2_x,n2_y,n2_str)
+%     xlabel('No correction','FontSize', fontsize)
+%     ylabel(labels{i+1},'FontSize', fontsize)
+% end
+% 
+% set(gcf,'Position',[350 10 300 650])
+% %% figure 4 dot plot contrast
+% figure
+% for i = 1:8
+%     subplot(4,2,i)
+%     x_data = AUCratio_HbO(1,:);
+%     y_data = AUCratio_HbO(i+1,:);
+%     plot(x_data,y_data,'bx');hold on;
+%     axis square
+%     n1 = sum(y_data>x_data);
+%     n2 = sum(y_data<x_data);
+%     n = size(x_data,2);
+%     n1 = n1/n;
+%     n2 = n2/n;
+%     min_data = min([min(x_data),min(y_data)]);
+%     max_data = max([max(x_data),max(y_data)]);
+%     plot([min_data,max_data],[min_data,max_data],'r-')
+%     xlim([min_data max_data])
+%     ylim([min_data max_data])
+%     xl = xlim;
+%     yl = ylim;
+%     n1_x = xl(1)+(xl(2)-xl(1))*1/4-(xl(2)-xl(1))*1/8;
+%     n1_y = (yl(1)+(yl(2)-yl(1))*3/4);
+%     n1_str = sprintf('%.2f%%',n1*100);
+%     text(n1_x,n1_y,n1_str);
+%     n2_x = (xl(1)+(xl(2)-xl(1))*3/4)-(xl(2)-xl(1))*1/8;
+%     n2_y = (yl(1)+(yl(2)-yl(1))*1/4);
+%     n2_str = sprintf('%.2f%%',n2*100);
+%     text(n2_x,n2_y,n2_str)
+%     xlabel('No correction','FontSize', fontsize)
+%     ylabel(labels{i+1},'FontSize', fontsize)
+% end
+% 
+% set(gcf,'Position',[30 10 300 650])
+% 
+% figure
+% for i = 1:8
+%     subplot(4,2,i)
+%     x_data = AUCratio_HbR(1,:);
+%     y_data = AUCratio_HbR(i+1,:);
+%     plot(x_data,y_data,'bx');hold on;
+%     axis square
+%     n1 = sum(y_data>x_data);
+%     n2 = sum(y_data<x_data);
+%     n = size(x_data,2);
+%     n1 = n1/n;
+%     n2 = n2/n;
+%     min_data = min([min(x_data),min(y_data)]);
+%     max_data = max([max(x_data),max(y_data)]);
+%     plot([min_data,max_data],[min_data,max_data],'r-')
+%     xlim([min_data max_data])
+%     ylim([min_data max_data])
+%     xl = xlim;
+%     yl = ylim;
+%     n1_x = xl(1)+(xl(2)-xl(1))*1/4-(xl(2)-xl(1))*1/8;
+%     n1_y = (yl(1)+(yl(2)-yl(1))*3/4);
+%     n1_str = sprintf('%.2f%%',n1*100);
+%     text(n1_x,n1_y,n1_str);
+%     n2_x = (xl(1)+(xl(2)-xl(1))*3/4)-(xl(2)-xl(1))*1/8;
+%     n2_y = (yl(1)+(yl(2)-yl(1))*1/4);
+%     n2_str = sprintf('%.2f%%',n2*100);
+%     text(n2_x,n2_y,n2_str)
+%     xlabel('No correction','FontSize', fontsize)
+%     ylabel(labels{i+1},'FontSize', fontsize)
+% end
+% 
+% set(gcf,'Position',[350 10 300 650])

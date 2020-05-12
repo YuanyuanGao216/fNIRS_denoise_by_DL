@@ -297,46 +297,53 @@ for i = 1:m/2
 end
 save('Processed_data/Testing_NN.mat','n_NN_HbO','n_NN_HbR')
 %% output time
-fprintf('Time for Spline is %f\n',T_Spline)
-fprintf('Time for Wavelet05 is %f\n',T_Wavelet05)
-fprintf('Time for Wavelet35 is %f\n',T_Wavelet35)
-fprintf('Time for Kalman is %f\n',T_Kalman)
-fprintf('Time for PCA99 is %f\n',T_PCA99)
-fprintf('Time for PCA50 is %f\n',T_PCA50)
-fprintf('Time for Cbsi is %f\n',T_Cbsi)
-% T_Spline = 7.701764;
-% T_Wavelet05 = 923.340527;
-% T_Wavelet35 = 925.933064;
-% T_Kalman = 48.733269;
-% T_PCA99 = 6.363904;
-% T_PCA50 = 6.462882;
-% T_Cbsi = 0.547667;
-% T_DAE = 0.3288;
+% fprintf('Time for Spline is %f\n',T_Spline)
+% fprintf('Time for Wavelet05 is %f\n',T_Wavelet05)
+% fprintf('Time for Wavelet35 is %f\n',T_Wavelet35)
+% fprintf('Time for Kalman is %f\n',T_Kalman)
+% fprintf('Time for PCA99 is %f\n',T_PCA99)
+% fprintf('Time for PCA50 is %f\n',T_PCA50)
+% fprintf('Time for Cbsi is %f\n',T_Cbsi)
+T_Spline = 8.637879;
+T_Wavelet05 = 1111.117784;
+T_Wavelet35 = 1102.784217;
+T_Kalman = 55.251534;
+T_PCA99 = 6.714928;
+T_PCA50 = 7.102599;
+T_Cbsi = 0.461004;
+T_DAE = 0.3288;
 % T_DAE = 0.3555;for 4 layers
 fprintf('Time for DAE is %f\n',T_DAE)
 
 T_list = [T_Spline,T_Wavelet05,T_Wavelet35,T_Kalman,T_PCA99,T_PCA50,T_Cbsi,T_DAE];
 labels = {'Spline','Wavelet05','Wavelet35','Kalman','PCA99','PCA50','Cbsi','DAE'};
 figure
-b = bar(T_list,'facecolor',[70 116 193]./256);
+b = bar(T_list,'facecolor',[108, 171, 215]./256,'edgecolor',[108, 171, 215]./256);
 
 xtips1 = b(1).XEndPoints;
-ytips1 = b(1).YEndPoints;
+ytips1 = b(1).YEndPoints+30;
 ydata = b(1).YData;
 labels1 = strings(1,8);
 for i = 1:size(ydata,2)
-    string_data = sprintf('%.2f',ydata(i));
+    string_data = sprintf('%.1f',ydata(i));
     labels1(i) = string_data;
 end
 text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
     'VerticalAlignment','bottom')
 
 ylabel('Computation time (s)')
+title('Computation time on testing dataset')
 set(gca, 'XTick', 1:size(T_list,2),'fontsize',12)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels)
-xtickangle(45)
-set(gcf,'Position',[465   440   450   215]);
-ylim([0 1200])
+xtickangle(90)
+set(gcf,'Position',[218   460   330   215]);
+ylim([0 1250])
 xlim([0.5 8.5])
-
+ax = gca;
+ax.XGrid = 'off';
+ax.YGrid = 'on';
+b.EdgeColor = [200, 14, 80]./255;
+b.FaceColor = 'flat';
+b.CData(9,:) = [200, 14, 80]./255;
+box off
