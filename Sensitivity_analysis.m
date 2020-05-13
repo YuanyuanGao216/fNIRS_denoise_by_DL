@@ -23,128 +23,128 @@ t  = 1/fs:1/fs:512/fs;
 STD = 10;
 tIncMan=ones(size(t))';
 %%
-% sigma_PCA_list = 0.51:0.04:0.99;
-% MSE_PCA = 1e6;
-% R2_PCA = 0;
-% CNR_PCA = 0;
-% n_left_PCA = 1e6;
-% MSE_PCA_j = 0;
-% R2_PCA_j = 0;
-% CNR_PCA_j = 0;
-% n_left_PCA_j = 0;
-% r2_list = [];
-% mse_list = [];
-% cnr_list = [];
-% n_list = [];
-% for sigma = sigma_PCA_list
-% % for sigma = [0.51 0.99]
-%     fprintf('sigma: %f\n',sigma)
-%     mse = 0;
-%     sse = 0;
-%     sst = 0;
-%     cnr = 0;
-%     n = 0;
-%     for i = 1:m/2
-% %     for i = 100:100
-%         dc_HbO  =   HbO_noised(i,:);
-%         dc_HbR  =   HbR_noised(i,:);
-%         dc      =   [dc_HbO;dc_HbR]';
-%         dc_real = [HbO(i,:),HbR(i,:)];
+sigma_PCA_list = 0.51:0.04:0.99;
+MSE_PCA = 1e6;
+R2_PCA = 0;
+CNR_PCA = 0;
+n_left_PCA = 1e6;
+MSE_PCA_j = 0;
+R2_PCA_j = 0;
+CNR_PCA_j = 0;
+n_left_PCA_j = 0;
+r2_list = [];
+mse_list = [];
+cnr_list = [];
+n_list = [];
+for sigma = sigma_PCA_list
+% for sigma = [0.51 0.99]
+    fprintf('sigma: %f\n',sigma)
+    mse = 0;
+    sse = 0;
+    sst = 0;
+    cnr = 0;
+    n = 0;
+    for i = 1:m/2
+%     for i = 100:100
+        dc_HbO  =   HbO_noised(i,:);
+        dc_HbR  =   HbR_noised(i,:);
+        dc      =   [dc_HbO;dc_HbR]';
+        dc_real = [HbO(i,:),HbR(i,:)];
+        
+%         figure
+%         hold on
+%         plot([dc_HbO,dc_HbR],'b')
+%         plot(dc_real,'k')
 %         
-% %         figure
-% %         hold on
-% %         plot([dc_HbO,dc_HbR],'b')
-% %         plot(dc_real,'k')
-% %         
-%         dod     =   hmrConc2OD( dc, SD1, ppf );
-%         [dod_PCA,~,~,~,~]   =   hmrMotionCorrectPCArecurse(dod,t,SD1,tIncMan,0.5,1,STD,200,sigma,5);
-%         [~,tIncAuto_PCA]    =   hmrMotionArtifactByChannel(dod_PCA,t,SD1,tIncMan,0.5,1,STD,200);
-%         dod_PCA             =   hmrBandpassFilt(dod_PCA,t,0,0.5);
-%         dc_PCA              =   hmrOD2Conc(dod_PCA,SD1,[6  6]);
-%         dc_predict_HbO = squeeze(dc_PCA(:,1,:));
-%         dc_predict_HbR = squeeze(dc_PCA(:,2,:));
-%         dc_predict = [dc_predict_HbO',dc_predict_HbR'];
-%         
-% %         plot(dc_predict,'r')
-%         n_MA_PCA = 0;
-%         for Ch = 1:2
-%             [n_MA_PCA_Ch,~,~]    =   CalMotionArtifact(tIncAuto_PCA(:,Ch));
-%             n_MA_PCA = n_MA_PCA + n_MA_PCA_Ch;
-%         end
-%         n   = n + n_MA_PCA;
-%         mse = mse + sum((dc_predict-dc_real).^2);
-%         sse = sse + sum((dc_predict-dc_real).^2);
-%         sst = sst + sum((mean(dc_real)-dc_real).^2);
-%         
-%         max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
-%         twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
-%         min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
-%         twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
-%         cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
-%         cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
-%         cnr = cnr + cnr_HbO + cnr_HbR;
-%         
-% %         fprintf('mse is %f\t sse is %f\t sst is %f\t r2 is %f\t cnr is %f\n',mse*1e6,sse*1e6,sst*1e6,1-sse/sst,cnr)
-%     end
-%     r2 = 1-sse/sst;
-%     fprintf('mse is %f\t r2 is %f\t cnr is %f\t n is %d\n',mse*1e6,1-sse/sst,cnr,n)
-%     r2_list(end+1) = r2;
-%     mse_list(end+1) = mse;
-%     cnr_list(end+1) = cnr;
-%     n_list(end+1) = n;
-%     if mse < MSE_PCA
-%         MSE_PCA = mse;
-%         MSE_PCA_j = sigma;
-%     end
-%     if r2 > R2_PCA
-%         R2_PCA = r2;
-%         R2_PCA_j = sigma;
-%     end
-%     if cnr > CNR_PCA
-%         CNR_PCA = cnr;
-%         CNR_PCA_j = sigma;
-%     end
-%     if n < n_left_PCA
-%         n_left_PCA = n;
-%         n_left_PCA_j = sigma;
-%     end
-% end
-% %%
-% figure('Renderer', 'painters', 'Position', [10 10 300 200])
-% plot(sigma_PCA_list,r2_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-% ylabel('R2')
-% xlabel('sigma')
-% title('PCA')
-% set(gca,'FontName','Times New Roman','FontSize',15)
-% saveas(gcf,'Figures/PCA_r2','fig')
-% saveas(gcf,'Figures/PCA_r2','svg')
-% 
-% figure('Renderer', 'painters', 'Position', [10 10 300 200])
-% plot(sigma_PCA_list,mse_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-% ylabel('mse')
-% xlabel('sigma')
-% title('PCA')
-% set(gca,'FontName','Times New Roman','FontSize',15)
-% saveas(gcf,'Figures/PCA_mse','fig')
-% saveas(gcf,'Figures/PCA_mse','svg')
-% 
-% figure('Renderer', 'painters', 'Position', [10 10 300 200])
-% plot(sigma_PCA_list,cnr_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-% ylabel('cnr')
-% xlabel('sigma')
-% title('PCA')
-% set(gca,'FontName','Times New Roman','FontSize',15)
-% saveas(gcf,'Figures/PCA_cnr','fig')
-% saveas(gcf,'Figures/PCA_cnr','svg')
-% 
-% figure('Renderer', 'painters', 'Position', [10 10 300 200])
-% plot(sigma_PCA_list,n_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-% ylabel('n')
-% xlabel('sigma')
-% title('PCA')
-% set(gca,'FontName','Times New Roman','FontSize',15)
-% saveas(gcf,'Figures/PCA_n','fig')
-% saveas(gcf,'Figures/PCA_n','svg')
+        dod     =   hmrConc2OD( dc, SD1, ppf );
+        [dod_PCA,~,~,~,~]   =   hmrMotionCorrectPCArecurse(dod,t,SD1,tIncMan,0.5,1,STD,200,sigma,5);
+        [~,tIncAuto_PCA]    =   hmrMotionArtifactByChannel(dod_PCA,t,SD1,tIncMan,0.5,1,STD,200);
+        dod_PCA             =   hmrBandpassFilt(dod_PCA,t,0,0.5);
+        dc_PCA              =   hmrOD2Conc(dod_PCA,SD1,[6  6]);
+        dc_predict_HbO = squeeze(dc_PCA(:,1,:));
+        dc_predict_HbR = squeeze(dc_PCA(:,2,:));
+        dc_predict = [dc_predict_HbO',dc_predict_HbR'];
+        
+%         plot(dc_predict,'r')
+        n_MA_PCA = 0;
+        for Ch = 1:2
+            [n_MA_PCA_Ch,~,~]    =   CalMotionArtifact(tIncAuto_PCA(:,Ch));
+            n_MA_PCA = n_MA_PCA + n_MA_PCA_Ch;
+        end
+        n   = n + n_MA_PCA;
+        mse = mse + sum((dc_predict-dc_real).^2);
+        sse = sse + sum((dc_predict-dc_real).^2);
+        sst = sst + sum((mean(dc_real)-dc_real).^2);
+        
+        max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
+        twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
+        min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
+        twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
+        cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
+        cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
+        cnr = cnr + cnr_HbO + cnr_HbR;
+        
+%         fprintf('mse is %f\t sse is %f\t sst is %f\t r2 is %f\t cnr is %f\n',mse*1e6,sse*1e6,sst*1e6,1-sse/sst,cnr)
+    end
+    r2 = 1-sse/sst;
+    fprintf('mse is %f\t r2 is %f\t cnr is %f\t n is %d\n',mse*1e6,1-sse/sst,cnr,n)
+    r2_list(end+1) = r2;
+    mse_list(end+1) = mse;
+    cnr_list(end+1) = cnr;
+    n_list(end+1) = n;
+    if mse < MSE_PCA
+        MSE_PCA = mse;
+        MSE_PCA_j = sigma;
+    end
+    if r2 > R2_PCA
+        R2_PCA = r2;
+        R2_PCA_j = sigma;
+    end
+    if cnr > CNR_PCA
+        CNR_PCA = cnr;
+        CNR_PCA_j = sigma;
+    end
+    if n < n_left_PCA
+        n_left_PCA = n;
+        n_left_PCA_j = sigma;
+    end
+end
+%%
+figure('Renderer', 'painters', 'Position', [10 10 300 200])
+plot(sigma_PCA_list,r2_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+ylabel('R2')
+xlabel('sigma')
+title('PCA')
+set(gca,'FontName','Times New Roman','FontSize',15)
+saveas(gcf,'Figures/PCA_r2','fig')
+saveas(gcf,'Figures/PCA_r2','svg')
+
+figure('Renderer', 'painters', 'Position', [10 10 300 200])
+plot(sigma_PCA_list,mse_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+ylabel('mse')
+xlabel('sigma')
+title('PCA')
+set(gca,'FontName','Times New Roman','FontSize',15)
+saveas(gcf,'Figures/PCA_mse','fig')
+saveas(gcf,'Figures/PCA_mse','svg')
+
+figure('Renderer', 'painters', 'Position', [10 10 300 200])
+plot(sigma_PCA_list,cnr_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+ylabel('cnr')
+xlabel('sigma')
+title('PCA')
+set(gca,'FontName','Times New Roman','FontSize',15)
+saveas(gcf,'Figures/PCA_cnr','fig')
+saveas(gcf,'Figures/PCA_cnr','svg')
+
+figure('Renderer', 'painters', 'Position', [10 10 300 200])
+plot(sigma_PCA_list,n_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+ylabel('n')
+xlabel('sigma')
+title('PCA')
+set(gca,'FontName','Times New Roman','FontSize',15)
+saveas(gcf,'Figures/PCA_n','fig')
+saveas(gcf,'Figures/PCA_n','svg')
 
 %%
 p_Spline_list = 0:0.01:1;

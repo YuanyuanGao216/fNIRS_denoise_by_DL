@@ -1,7 +1,4 @@
-clear all
-close all
-clc
-%% simulation
+%% data simulation
 % simulate the resting data from real
 SimulateRestingData
 % characterize noise from real

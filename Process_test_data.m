@@ -1,6 +1,3 @@
-clear all
-clc
-close all
 %% add homer path
 pathHomer = '../../Tools/homer2_src_v2_3_10202017';
 oldpath = cd(pathHomer);
@@ -297,21 +294,21 @@ for i = 1:m/2
 end
 save('Processed_data/Testing_NN.mat','n_NN_HbO','n_NN_HbR')
 %% output time
-% fprintf('Time for Spline is %f\n',T_Spline)
-% fprintf('Time for Wavelet05 is %f\n',T_Wavelet05)
-% fprintf('Time for Wavelet35 is %f\n',T_Wavelet35)
-% fprintf('Time for Kalman is %f\n',T_Kalman)
-% fprintf('Time for PCA99 is %f\n',T_PCA99)
-% fprintf('Time for PCA50 is %f\n',T_PCA50)
-% fprintf('Time for Cbsi is %f\n',T_Cbsi)
-T_Spline = 8.637879;
-T_Wavelet05 = 1111.117784;
-T_Wavelet35 = 1102.784217;
-T_Kalman = 55.251534;
-T_PCA99 = 6.714928;
-T_PCA50 = 7.102599;
-T_Cbsi = 0.461004;
-T_DAE = 0.3288;
+fprintf('Time for Spline is %f\n',T_Spline)
+fprintf('Time for Wavelet05 is %f\n',T_Wavelet05)
+fprintf('Time for Wavelet35 is %f\n',T_Wavelet35)
+fprintf('Time for Kalman is %f\n',T_Kalman)
+fprintf('Time for PCA99 is %f\n',T_PCA99)
+fprintf('Time for PCA50 is %f\n',T_PCA50)
+fprintf('Time for Cbsi is %f\n',T_Cbsi)
+% T_Spline = 8.637879;
+% T_Wavelet05 = 1111.117784;
+% T_Wavelet35 = 1102.784217;
+% T_Kalman = 55.251534;
+% T_PCA99 = 6.714928;
+% T_PCA50 = 7.102599;
+% T_Cbsi = 0.461004;
+% T_DAE = 0.3288;
 % T_DAE = 0.3555;for 4 layers
 fprintf('Time for DAE is %f\n',T_DAE)
 

@@ -1,13 +1,3 @@
-% Extract qualified data: 0~25s with some Motion artifacts.
-% Save the data as Testing data.
-% Process data via PCA etc. and save as output HRF and n_MA_left
-% Extract motion artifact peak distribution and HRF peak values
-% distribution
-% what does motion artifact look like in the real data?
-
-clear all
-clc
-close all
 %% add homer path
 pathHomer = '../../Tools/homer2_src_v2_3_10202017';
 oldpath = cd(pathHomer);

@@ -1,5 +1,3 @@
-clear all
-close all
 %% add homer path
 pathHomer = '../../Tools/homer2_src_v2_3_10202017';
 oldpath = cd(pathHomer);
@@ -128,7 +126,6 @@ figure
 
 x_data = MSE_HbO(1,:);
 y_data = MSE_HbO(2:end,:);
-% n1 = sum(y_data>repmat(x_data,size(y_data,1),1),2);
 n2 = sum(y_data<repmat(x_data,size(y_data,1),1),2);
 n = size(x_data,2);
 
@@ -137,7 +134,6 @@ b = bar(y,'facecolor',[108, 171, 215]./256);
 title('Proportion of trials whose MSE decreased')
 set(gca, 'YTick', [0, 50, 100], 'YLim', [0, 100]);
 ytickformat(gca, 'percentage');
-% gca.YGrid = 'on';
 set(gca, 'XTick', 1:size(MA_list,2)-1)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels(2:end))
@@ -148,7 +144,6 @@ ylim([0 110])
 xtips1 = b(1).XEndPoints;
 ytips1 = b(1).YEndPoints;
 labels1 = string(b(1).YData);
-% labels1 = string(1,8);
 for i = 1:length(b(1).YData)
     labels1(i) = sprintf('%.0f%%',b(1).YData(i));
 end
@@ -167,7 +162,6 @@ figure
 
 x_data = MSE_HbR(1,:);
 y_data = MSE_HbR(2:end,:);
-% n1 = sum(y_data>repmat(x_data,size(y_data,1),1),2);
 n2 = sum(y_data<repmat(x_data,size(y_data,1),1),2);
 n = size(x_data,2);
 
@@ -187,7 +181,7 @@ ylim([0 110])
 xtips1 = b(1).XEndPoints;
 ytips1 = b(1).YEndPoints;
 labels1 = string(b(1).YData);
-% labels1 = string(1,8);
+
 for i = 1:length(b(1).YData)
     labels1(i) = sprintf('%.0f%%',b(1).YData(i));
 end
@@ -232,7 +226,6 @@ figure
 
 x_data = cnr_HbO(1,:);
 y_data = cnr_HbO(2:end,:);
-% n1 = sum(y_data>repmat(x_data,size(y_data,1),1),2);
 n2 = sum(y_data>repmat(x_data,size(y_data,1),1),2);
 n = size(x_data,2);
 
@@ -252,7 +245,7 @@ ylim([0 110])
 xtips1 = b(1).XEndPoints;
 ytips1 = b(1).YEndPoints;
 labels1 = string(b(1).YData);
-% labels1 = string(1,8);
+
 for i = 1:length(b(1).YData)
     labels1(i) = sprintf('%.0f%%',b(1).YData(i));
 end
@@ -271,7 +264,7 @@ figure
 
 x_data = cnr_HbR(1,:);
 y_data = cnr_HbR(2:end,:);
-% n1 = sum(y_data>repmat(x_data,size(y_data,1),1),2);
+
 n2 = sum(y_data<repmat(x_data,size(y_data,1),1),2);
 n = size(x_data,2);
 
@@ -280,7 +273,7 @@ b = bar(y,'facecolor',[108, 171, 215]./256);
 title('Proportion of trials whose CNR increased')
 set(gca, 'YTick', [0, 50, 100], 'YLim', [0, 100]);
 ytickformat(gca, 'percentage');
-% gca.YGrid = 'on';
+
 set(gca, 'XTick', 1:size(MA_list,2)-1)
 set(gca, 'FontName', 'Arial')
 set(gca, 'XTickLabel', labels(2:end))
@@ -291,7 +284,7 @@ ylim([0 110])
 xtips1 = b(1).XEndPoints;
 ytips1 = b(1).YEndPoints;
 labels1 = string(b(1).YData);
-% labels1 = string(1,8);
+
 for i = 1:length(b(1).YData)
     labels1(i) = sprintf('%.0f%%',b(1).YData(i));
 end
@@ -306,7 +299,7 @@ b.FaceColor = 'flat';
 b.CData(8,:) = [200, 14, 80]./255;
 box off
 %% 4. low ns high noise vol.
-% test_idx_HbO = p(n_train+n_val+1:end);
+
 peak_n_list_test = peak_n_list(test_idx,:);
 shift_n_list_test = shift_n_list(test_idx,:);
 m = size(peak_n_list_test);
@@ -341,7 +334,7 @@ box off
 hold off
 
 %% 4. peak ns shift
-% test_idx_HbO = p(n_train+n_val+1:end);
+
 peak_n_list_test = peak_n_list(test_idx,:);
 shift_n_list_test = shift_n_list(test_idx,:);
 m = size(peak_n_list_test);

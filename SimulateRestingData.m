@@ -1,9 +1,5 @@
 % Simulate m samples
 % simulated data = Noise + motion artifacts + evoked response
-% function output = SimulateData(m)
-clear all
-clc
-close all
 seed = 101;
 rng(seed)
 STD = 10;
@@ -96,7 +92,6 @@ for folder = 4:length(Subfolders)
                                     try
                                         EstMd = estimate(Md,Resting_HbO,'Display','off');
                                     catch
-%                                         fprintf('unable to estimate\n')
                                         continue
                                     end
                                     Constant = EstMd.Constant;
@@ -126,7 +121,6 @@ for folder = 4:length(Subfolders)
                                     try
                                         EstMd = estimate(Md,Resting_HbR,'Display','off');
                                     catch
-%                                         fprintf('unable to estimate\n')
                                         continue
                                     end
                                     Constant = EstMd.Constant;

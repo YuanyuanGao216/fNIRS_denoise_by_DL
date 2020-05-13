@@ -1,5 +1,4 @@
-% function SimulateMotionArtifacts()
-clear all
+
 %% load data
 load('Processed_data/simulated_HbO.mat','simulated_HbO')
 load('Processed_data/simulated_HbR.mat','simulated_HbR')
@@ -202,9 +201,3 @@ save('Processed_data/amp_HRF_list.mat','amp_HRF_list')
 save('Processed_data/drift_Hb_list.mat','drift_Hb_list')
 % noise parameters
 save('Processed_data/neg_sign.mat','neg_sign')
-%%
-figure
-hold on
-plot(HRF_test(1,:))
-plot(HRF_test_noised(1,:))
-plot(Noise_test(1,:))

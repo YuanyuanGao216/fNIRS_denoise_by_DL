@@ -1,6 +1,3 @@
-% Plot_loss
-clear all
-
 load('Processed_data/train_loss_8layers.txt');
 load('Processed_data/val_loss_8layers.txt');
 
