@@ -23,10 +23,12 @@ t  = 1/fs:1/fs:512/fs;
 STD = 10;
 tIncMan=ones(size(t))';
 %%
-sigma_PCA_list = 0.51:0.04:0.99;
-mse_list = [];
-cnr_list = [];
-n_list = [];
+sigma_PCA_list = 0.81:0.04:0.97;
+
+mse_list = zeros(length(sigma_PCA_list),1);
+cnr_list = zeros(length(sigma_PCA_list),1);
+n_list = zeros(length(sigma_PCA_list),1);
+j = 1;
 for sigma = sigma_PCA_list
 % for sigma = [0.51 0.99]
     fprintf('sigma: %f\n',sigma)
@@ -66,23 +68,22 @@ for sigma = sigma_PCA_list
         sse = sse + sum((dc_predict-dc_real).^2);
         sst = sst + sum((mean(dc_real)-dc_real).^2);
         
-        max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
-        twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
-        min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
-        twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
-        cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
-        cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
+        cnr_HbO = snr_cal(dc_predict_HbO);
+        cnr_HbR = snr_cal(dc_predict_HbR);
+%         max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
+%         twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
+%         min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
+%         twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
+%         cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
+%         cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
         cnr = cnr + cnr_HbO + cnr_HbR;
         
-%         fprintf('mse is %f\t sse is %f\t sst is %f\t r2 is %f\t cnr is %f\n',mse*1e6,sse*1e6,sst*1e6,1-sse/sst,cnr)
     end
-    r2 = 1-sse/sst;
     fprintf('mse is %f\t r2 is %f\t cnr is %f\t n is %d\n',mse*1e6,1-sse/sst,cnr,n)
-    r2_list(end+1) = r2;
-    mse_list(end+1) = mse;
-    cnr_list(end+1) = cnr;
-    n_list(end+1) = n;
-    
+    mse_list(j) = mse;
+    cnr_list(j) = cnr;
+    n_list(j) = n;
+    j = j + 1;
 end
 %%
 
@@ -114,16 +115,8 @@ saveas(gcf,'Figures/PCA_n','fig')
 saveas(gcf,'Figures/PCA_n','svg')
 
 %%
-p_Spline_list = 0:0.01:1;
-MSE_Spline = 1e6;
-R2_Spline = 0;
-CNR_Spline = 0;
-n_left_Spline = 1e6;
-MSE_Spline_j = 0;
-R2_Spline_j = 0;
-CNR_Spline_j = 0;
-n_left_Spline_j = 0;
-r2_list = [];
+% p_Spline_list = 0.9:0.01:1;
+p_Spline_list = 1;
 mse_list = [];
 cnr_list = [];
 n_list = [];
@@ -159,12 +152,14 @@ for p = p_Spline_list
         sse     = sse + sum((dc_predict-dc_real).^2);
         sst     = sst + sum((mean(dc_real)-dc_real).^2);
         
-        max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
-        twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
-        min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
-        twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
-        cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
-        cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
+        cnr_HbO = snr_cal(dc_predict_HbO);
+        cnr_HbR = snr_cal(dc_predict_HbR);
+%         max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
+%         twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
+%         min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
+%         twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
+%         cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
+%         cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
         cnr = cnr + cnr_HbO + cnr_HbR;
         
     end
@@ -191,17 +186,9 @@ for p = p_Spline_list
         n_left_Spline_j = p;
     end
 end
-figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(p_Spline_list,r2_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-ylabel('R2')
-xlabel('p')
-title('Spline')
-set(gca,'FontName','Times New Roman','FontSize',15)
-saveas(gcf,'Figures/Spline_r2','fig')
-saveas(gcf,'Figures/Spline_r2','svg')
 
 figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(p_Spline_list,mse_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+plot(p_Spline_list,mse_list./m,'Linewidth',1,'Marker','o','markerfacecolor','b')
 ylabel('mse')
 xlabel('p')
 title('Spline')
@@ -210,7 +197,7 @@ saveas(gcf,'Figures/Spline_mse','fig')
 saveas(gcf,'Figures/Spline_mse','svg')
 
 figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(p_Spline_list,cnr_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+plot(p_Spline_list,cnr_list./m,'Linewidth',1,'Marker','o','markerfacecolor','b')
 ylabel('cnr')
 xlabel('p')
 title('Spline')
@@ -227,15 +214,6 @@ set(gca,'FontName','Times New Roman','FontSize',15)
 saveas(gcf,'Figures/Spline_n','fig')
 saveas(gcf,'Figures/Spline_n','svg')
 %%
-alpha_Wavelet = 0.05:0.05:0.4;
-MSE_Wavelet = 1e6;
-R2_Wavelet = 0;
-CNR_Wavelet = 0;
-n_left_Wavelet = 1e6;
-MSE_Wavelet_j = 0;
-R2_Wavelet_j = 0;
-CNR_Wavelet_j = 0;
-n_left_Wavelet_j = 0;
 r2_list = [];
 mse_list = [];
 cnr_list = [];
@@ -275,52 +253,25 @@ for alpha = alpha_Wavelet
         mse = mse + sum((dc_predict-dc_real).^2);
         sse = sse + sum((dc_predict-dc_real).^2);
         sst = sst + sum((mean(dc_real)-dc_real).^2);
-        
-        max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
-        twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
-        min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
-        twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
-        cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
-        cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
+        cnr_HbO = snr_cal(dc_predict_HbO);
+        cnr_HbR = snr_cal(dc_predict_HbR);
+%         max_index_HbO = find(HbO(i,:) == max(HbO(i,:)));
+%         twosecond_HbO = max_index_HbO-round(1*fs):max_index_HbO+round(1*fs);
+%         min_index_HbR = find(HbR(i,:) == min(HbR(i,:)));
+%         twosecond_HbR = min_index_HbR-round(1*fs):min_index_HbR+round(1*fs);
+%         cnr_HbO = abs(mean(dc_predict_HbO(twosecond_HbO))-mean(dc_predict_HbO(1:round(2*fs))))/std(dc_predict_HbO'-HbO(i,:));
+%         cnr_HbR = abs(mean(dc_predict_HbR(twosecond_HbR))-mean(dc_predict_HbR(1:round(2*fs))))/std(dc_predict_HbR'-HbR(i,:));
         cnr = cnr + cnr_HbO + cnr_HbR;
         
     end
-    display(n)
-    return
-    r2 = 1-sse/sst;
-    fprintf('mse is %f\t r2 is %f\t cnr is %f\t n is %d\n',mse*1e6,1-sse/sst,cnr,n)
-    r2_list(end+1) = r2;
     mse_list(end+1) = mse;
     cnr_list(end+1) = cnr;
     n_list(end+1) = n;
-    if mse < MSE_Wavelet
-        MSE_Wavelet = mse;
-        MSE_Wavelet_j = alpha;
-    end
-    if r2 > R2_Wavelet
-        R2_Wavelet = r2;
-        R2_Wavelet_j = alpha;
-    end
-    if cnr > CNR_Wavelet
-        CNR_Wavelet = cnr;
-        CNR_Wavelet_j = alpha;
-    end
-    if n < n_left_Wavelet
-        n_left_Wavelet = n;
-        n_left_Wavelet_j = alpha;
-    end
+    
 end
-figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(alpha_Wavelet,r2_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
-ylabel('R2')
-xlabel('alpha')
-title('Wavelet')
-set(gca,'FontName','Times New Roman','FontSize',15)
-saveas(gcf,'Figures/Wavelet_r2','fig')
-saveas(gcf,'Figures/Wavelet_r2','svg')
 
 figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(alpha_Wavelet,mse_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+plot(alpha_Wavelet,mse_list./m,'Linewidth',1,'Marker','o','markerfacecolor','b')
 ylabel('mse')
 xlabel('alpha')
 title('Wavelet')
@@ -329,7 +280,7 @@ saveas(gcf,'Figures/Wavelet_mse','fig')
 saveas(gcf,'Figures/Wavelet_mse','svg')
 
 figure('Renderer', 'painters', 'Position', [10 10 300 200])
-plot(alpha_Wavelet,cnr_list,'Linewidth',1,'Marker','o','markerfacecolor','b')
+plot(alpha_Wavelet,cnr_list./m,'Linewidth',1,'Marker','o','markerfacecolor','b')
 ylabel('cnr')
 xlabel('alpha')
 title('Wavelet')
@@ -346,41 +297,11 @@ set(gca,'FontName','Times New Roman','FontSize',15)
 saveas(gcf,'Figures/Wavelet_n','fig')
 saveas(gcf,'Figures/Wavelet_n','svg')
 
+function snr_mat = snr_cal(Hb)
+[m,n] = size(Hb);
+if m > n
+    Hb = Hb';
+end
+snr_mat = abs(mean(Hb,2)./std(Hb,0,2));
 
-
-fprintf('PCA:\n')
-fprintf('mse is %f \t sigma is %f\n',MSE_PCA*1e6, MSE_PCA_j)
-fprintf('r2 is %f \t sigma is %f\n',R2_PCA,R2_PCA_j)
-fprintf('cnr is %f \t sigma is %f\n',CNR_PCA,CNR_PCA_j)
-fprintf('n is %f \t sigma is %f\n',n_left_PCA,n_left_PCA_j)
-fprintf('Spline:\n')
-fprintf('mse is %f \t sigma is %f\n',MSE_Spline*1e6, MSE_Spline_j)
-fprintf('r2 is %f \t sigma is %f\n',R2_Spline,R2_Spline_j)
-fprintf('cnr is %f \t sigma is %f\n',CNR_Spline,CNR_Spline_j)
-fprintf('n is %f \t sigma is %f\n',n_left_Spline,n_left_Spline_j)
-fprintf('Wavelet:\n')
-fprintf('mse is %f \t sigma is %f\n',MSE_Wavelet*1e6, MSE_Wavelet_j)
-fprintf('r2 is %f \t sigma is %f\n',R2_Wavelet,R2_Wavelet_j)
-fprintf('cnr is %f \t sigma is %f\n',CNR_Wavelet,CNR_Wavelet_j)
-fprintf('n is %f \t sigma is %f\n',n_left_Wavelet,n_left_Wavelet_j)
-
-filename = 'Processed_data/Sensitivity.txt';
-Sensitivity_file = fopen(filename,'w');
-
-fprintf(Sensitivity_file,'PCA:\n');
-fprintf(Sensitivity_file,'mse is %f \t sigma is %f\n',MSE_PCA*1e6, MSE_PCA_j);
-fprintf(Sensitivity_file,'r2 is %f \t sigma is %f\n',R2_PCA,R2_PCA_j);
-fprintf(Sensitivity_file,'cnr is %f \t sigma is %f\n',CNR_PCA,CNR_PCA_j);
-fprintf(Sensitivity_file,'n is %f \t sigma is %f\n',n_left_PCA,n_left_PCA_j);
-fprintf(Sensitivity_file,'Spline:\n');
-fprintf(Sensitivity_file,'mse is %f \t sigma is %f\n',MSE_Spline*1e6, MSE_Spline_j);
-fprintf(Sensitivity_file,'r2 is %f \t sigma is %f\n',R2_Spline,R2_Spline_j);
-fprintf(Sensitivity_file,'cnr is %f \t sigma is %f\n',CNR_Spline,CNR_Spline_j);
-fprintf(Sensitivity_file,'n is %f \t sigma is %f\n',n_left_Spline,n_left_Spline_j);
-fprintf(Sensitivity_file,'Wavelet:\n');
-fprintf(Sensitivity_file,'mse is %f \t sigma is %f\n',MSE_Wavelet*1e6, MSE_Wavelet_j);
-fprintf(Sensitivity_file,'r2 is %f \t sigma is %f\n',R2_Wavelet,R2_Wavelet_j);
-fprintf(Sensitivity_file,'cnr is %f \t sigma is %f\n',CNR_Wavelet,CNR_Wavelet_j);
-fprintf(Sensitivity_file,'n is %f \t sigma is %f\n',n_left_Wavelet,n_left_Wavelet_j);
-
-fclose(Sensitivity_file);
+end
