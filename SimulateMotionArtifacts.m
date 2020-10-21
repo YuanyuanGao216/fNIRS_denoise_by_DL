@@ -81,14 +81,9 @@ for i = 1:n_sample
     % 5µM decrease in HbR concentration [these figures include a partial volume correction factor of 50 (Strangman et al., 2003)]. S
     % so I used 10~15µM increase
     amp_HbO = 10 + (15 - 10) * rand;
-    amp_HbR = -amp_HbO/3;
-    HRF_HbO = amp_HbO./gamma((1:(512-40))/5/fs_new); % figure; plot(HRF_HbO);
-    HRF_HbR = amp_HbR./gamma((1:(512-40))/5/fs_new); % figure; plot(HRF_HbR);
-    % total length 5*512
-    HRFs_HbO = conv(HRF_HbO,s);% figure; plot(HRFs_HbO)
-    HRFs_HbR = conv(HRF_HbR,s);% figure; plot(HRFs_HbO)
-    HRFs_HbO = HRFs_HbO(1:tp) * 1e-6;
-    HRFs_HbR = HRFs_HbR(1:tp) * 1e-6;
+    HRFs    =   make_HRFs(s, amp_HbO);
+    HRFs_HbO = HRFs.HbO;
+    HRFs_HbR = HRFs.HbR;
     %% sum up
     noised_HRF_HbO = Resting_HbO + HRFs_HbO + noise_HbO;
     noised_HRF_HbR = Resting_HbR + HRFs_HbR + noise_HbR;
