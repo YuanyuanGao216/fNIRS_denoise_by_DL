@@ -7,4 +7,4 @@ dc                      =   hmrOD2Conc(dod,SD,[6  6]);
 dod                     =   hmrConc2OD(dc,SD,[6  6]);
 [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,200);
 [dc_avg, ~, ~, ~, ~, ~] =   hmrBlockAvg(dc, s', t, [-39/fs_new (512-40)/fs_new] ); 
-n_MA                    =   count_no_correction(tIncAuto);
+n_MA                    =   count_MA(tIncAuto);
