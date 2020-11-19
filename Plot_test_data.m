@@ -5,8 +5,8 @@ oldpath     =   cd(pathHomer);
 setpaths;
 cd(oldpath);
 %% load data
-load('Processed_data/HRF_test.mat','HRF_test')
-load('Processed_data/HRF_test_noised.mat','HRF_test_noised')
+clear all
+load('Processed_data/SimulateData.mat','HRF_test','HRF_test_noised')
 
 [m,n]       =   size(HRF_test_noised);
 HbO_noised  =   HRF_test_noised(1:m/2,:);
@@ -15,26 +15,24 @@ HbO         =   HRF_test(1:m/2,:);
 HbR         =   HRF_test(m/2+1:end,:);
 
 load('Processed_data/Testing_Spline.mat')
-load('Processed_data/Testing_Wavelet05.mat')
-load('Processed_data/Testing_Wavelet35.mat')
+load('Processed_data/Testing_Wavelet01.mat')
 load('Processed_data/Testing_Kalman.mat')
 load('Processed_data/Testing_PCA99.mat')
-load('Processed_data/Testing_PCA50.mat')
+load('Processed_data/Testing_PCA79.mat')
 load('Processed_data/Testing_Cbsi.mat')
 load('Processed_data/Testing_NN.mat')
 
 filepath = 'Processed_data/Test_NN_8layers.mat';
 
-if exist(filepath, 'file') == 2
-    load(filepath)% File exists.
-    Hb_NN = Y_test;
-else
-    Hb_NN = zeros(size(HbO));
-    % File does not exist.
-end
+load(filepath)% File exists.
+Hb_NN = Y_test_predict;
 
-HbO_NN = Hb_NN(:,1:size(HbO,2));
-HbR_NN = Hb_NN(:,size(HbO,2)+1:end);
+HbO_NN = Hb_NN(:,1:512);
+HbR_NN = Hb_NN(:,512+1:end);
+HbO_NN = reshape(HbO_NN',[512*5,644]);
+HbR_NN = reshape(HbR_NN',[512*5,644]);
+HbO_NN = HbO_NN';
+HbR_NN = HbR_NN';
 
 HbO             =   HbO * 1e6;
 HbR             =   HbR * 1e6;
@@ -44,22 +42,20 @@ HbO_noised      =   HbO_noised *1e6;
 HbR_noised      =   HbR_noised *1e6;
 
 HbO_Spline      =   HbO_Spline * 1e6;
-HbO_Wavelet05   =   HbO_Wavelet05 * 1e6;
-HbO_Wavelet35   =   HbO_Wavelet35 * 1e6;
+HbO_Wavelet01   =   HbO_Wavelet01 * 1e6;
 HbO_Kalman      =   HbO_Kalman * 1e6;
 HbO_PCA99       =   HbO_PCA99 * 1e6;
-HbO_PCA50       =   HbO_PCA50 * 1e6;
+HbO_PCA79       =   HbO_PCA79 * 1e6;
 HbO_Cbsi        =   HbO_Cbsi * 1e6;
 
 HbR_Spline      =   HbR_Spline * 1e6;
-HbR_Wavelet05   =   HbR_Wavelet05 * 1e6;
-HbR_Wavelet35   =   HbR_Wavelet35 * 1e6;
+HbR_Wavelet01   =   HbR_Wavelet01 * 1e6;
 HbR_Kalman      =   HbR_Kalman * 1e6;
 HbR_PCA99       =   HbR_PCA99 * 1e6;
-HbR_PCA50       =   HbR_PCA50 * 1e6;
+HbR_PCA79       =   HbR_PCA79 * 1e6;
 HbR_Cbsi        =   HbR_Cbsi * 1e6;
 
-labels = {'No correction','Spline','Wavelet05','Wavelet35','Kalman','PCA99','PCA50','Cbsi','DAE'};
+labels = {'No correction','Spline','Wavelet01','Kalman','PCA99','PCA79','Cbsi','DAE'};
 %% figure 0: Example plot
 piece = input('Which piece you want to show? ');
 % 3 and 5

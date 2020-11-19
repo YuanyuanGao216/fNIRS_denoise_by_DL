@@ -1,6 +1,6 @@
 function plot_real_data(t,dc,tInc,ch,t_span,Resting_HbO,sim_data_HbO)
 if (nargin == 0)
-    load('plot_Resting.mat');
+    load('Processed_data/plot_Resting.mat');
     ch = channel;
 end
 

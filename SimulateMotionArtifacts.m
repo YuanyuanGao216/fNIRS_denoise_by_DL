@@ -11,15 +11,8 @@ n_sample = min(n_HbO,n_HbR);
 simulated_HbO = simulated_HbO(1:n_sample,:);
 simulated_HbR = simulated_HbR(1:n_sample,:);
 %% define constants
-global fs_new
-fs_new = 7;
-global rt
-global pt
-rt =   40; %resting time 5.7s
-pt =   512-40; %performance time 65.536s - 5.7s
+define_constants
 
-seed = 101;
-rng(seed,'twister');
 %% define n_list: a list of No. of MA for simulated samples 
 tp = size(simulated_HbO,2);
 t = (1:tp)/fs_new;
@@ -79,8 +72,8 @@ for i = 1:n_sample
     % a time-to-peak of 7 s, a duration of 20 s and an amplitude defined
     % so as to produce a 15µM increase in HbO concentration and a
     % 5µM decrease in HbR concentration [these figures include a partial volume correction factor of 50 (Strangman et al., 2003)]. S
-    % so I used 10~15µM increase
-    amp_HbO = 10 + (15 - 10) * rand;
+    % so I used 10~20µM increase
+    amp_HbO = 10 + (20 - 10) * rand;
     HRFs    =   make_HRFs(s, amp_HbO);
     HRFs_HbO = HRFs.HbO;
     HRFs_HbR = HRFs.HbR;
@@ -122,9 +115,9 @@ Noise_train     =   [noise_HbO(train_idx,:);    noise_HbR(train_idx,:)];
 Noise_val       =   [noise_HbO(val_idx,:);      noise_HbO(val_idx,:)];
 Noise_test      =   [noise_HbO(test_idx,:);     noise_HbO(test_idx,:)];
 
-Resting_train   =   [Resting_HbO(train_idx,:);  Resting_HbR(train_idx,:)];
-Resting_val     =   [Resting_HbO(val_idx,:);    Resting_HbR(val_idx,:)];
-Resting_test    =   [Resting_HbO(test_idx,:);   Resting_HbR(test_idx,:)];
+Resting_train   =   [simulated_HbO(train_idx,:);  simulated_HbR(train_idx,:)];
+Resting_val     =   [simulated_HbO(val_idx,:);    simulated_HbR(val_idx,:)];
+Resting_test    =   [simulated_HbO(test_idx,:);   simulated_HbR(test_idx,:)];
 
 %% save
 save('Processed_data/SimulateData.mat',...

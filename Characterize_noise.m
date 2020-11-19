@@ -7,9 +7,7 @@ setpaths;
 cd(oldpath);
 
 %% define constants
-global fs_new
-fs_new = 7;
-STD = 10;
+define_constants
 
 %% define variables to be calulated
 % amplitude of change
@@ -34,7 +32,7 @@ for file = 1:length(Files) - 1 % save the last one for testing
     t           =   fNIRS_data.t;
     tIncMan     =   ones(size(t));
     %% standard processing wo correction
-    [dc,SD,tInc]    =   proc_wo_crct(d,SD,t,STD);
+    [dc,SD,tInc]    =   proc_wo_crct(d,SD,t,STD,OD_thred);
     n_Ch            =   size(dc,3);
     %% calculate how many MA detected in this file
     [n_MA,runstarts,runends] = CalMotionArtifact(tInc);
@@ -57,6 +55,12 @@ for file = 1:length(Files) - 1 % save the last one for testing
                 end_point   =   runends(i) - 1;
                 MA_HbO      =   squeeze(dc(start_point:end_point,bio,Ch));
                 diff_Hb     =   max(MA_HbO)-min(MA_HbO);
+%                 if diff_Hb > 100 * 1e-6
+%                     fprintf('file is %s, channel is %d, %dth MA\n',name,Ch,i);
+%                     figure
+%                     plot(squeeze(dc(:,bio,Ch)),'b');hold on;
+%                     plot(start_point:end_point, squeeze(dc(start_point:end_point,bio,Ch)),'r')
+%                 end
                 if bio == 1
                     diff_HbO_list(end+1) = diff_Hb;
                 else

@@ -190,56 +190,53 @@ def std_loss(y_pred):
     amp_loss = (diff * mask_amp).sum() / (mask_amp.sum()+1e-7)
 
     return mc_loss + amp_loss
-## load data
+# %% load data
 np.random.seed(50)
+
 X_train = scipy.io.loadmat('Processed_data/HRF_train_noised.mat')
-X_train = X_train['HRF_train_noised'];
-n = X_train.shape[0];
+X_train = X_train['HRF_train_noised']
+X_train = X_train.reshape((-1, 512))
+n = X_train.shape[0]
 X_train = np.concatenate((X_train[0:int(n/2),:],X_train[int(n/2):,:]),axis = 1)
+
 X_val = scipy.io.loadmat('Processed_data/HRF_val_noised.mat')
-X_val = X_val['HRF_val_noised'];
+X_val = X_val['HRF_val_noised']
+X_val = X_val.reshape((-1, 512))
 n = X_val.shape[0];
 X_val = np.concatenate((X_val[0:int(n/2),:],X_val[int(n/2):,:]),axis = 1)
 
 
 X_test = scipy.io.loadmat('Processed_data/HRF_test_noised.mat')
-X_test = X_test['HRF_test_noised'];
+X_test = X_test['HRF_test_noised']
+X_test = X_test.reshape((-1, 512))
 n = X_test.shape[0];
 X_test = np.concatenate((X_test[0:int(n/2),:],X_test[int(n/2):,:]),axis = 1)
 
 Y_train = scipy.io.loadmat('Processed_data/HRF_train.mat')
-Y_train = Y_train['HRF_train'];
-n = Y_train.shape[0];
+Y_train = Y_train['HRF_train']
+Y_train = Y_train.reshape((-1, 512))
+n = Y_train.shape[0]
 Y_train = np.concatenate((Y_train[0:int(n/2),:],Y_train[int(n/2):,:]),axis = 1)
+
 Y_val = scipy.io.loadmat('Processed_data/HRF_val.mat')
-Y_val = Y_val['HRF_val'];
+Y_val = Y_val['HRF_val']
+Y_val = Y_val.reshape((-1, 512))
 n = Y_val.shape[0];
 Y_val = np.concatenate((Y_val[0:int(n/2),:],Y_val[int(n/2):,:]),axis = 1)
+
 Y_test = scipy.io.loadmat('Processed_data/HRF_test.mat')
-Y_test = Y_test['HRF_test'];
+Y_test = Y_test['HRF_test']
+Y_test = Y_test.reshape((-1, 512))
 n = Y_test.shape[0];
 Y_test = np.concatenate((Y_test[0:int(n/2),:],Y_test[int(n/2):,:]),axis = 1)
 
-# x = np.concatenate((X_train,X_val),axis = 0)
-# y = np.concatenate((Y_train,Y_val),axis = 0)
-
-# idx = np.array(range(x.shape[0]))
-# np.random.shuffle(idx)
-
-# x = x[idx,:]
-# y = y[idx,:]
-
-# X_train = x[:int(x.shape[0] * (8/9)),:]
-# X_val = x[int(x.shape[0] * (8/9)):,:]
-# Y_train = y[:int(x.shape[0] * (8/9)),:]
-# Y_val = y[int(x.shape[0] * (8/9)):,:]
-
+# %% here need to change; the real finrs dc data need to be saved, the leave out one
 X_real_HbO = scipy.io.loadmat('Processed_data/Real_HbO.mat')
-X_real_HbO = X_real_HbO['Real_HbO'];
+X_real_HbO = X_real_HbO['Real_HbO']
 X_real_HbR = scipy.io.loadmat('Processed_data/Real_HbR.mat')
-X_real_HbR = X_real_HbR['Real_HbR'];
+X_real_HbR = X_real_HbR['Real_HbR']
 X_real = np.concatenate((X_real_HbO,X_real_HbR),axis = 1)
-
+# %% double check the magnitude 
 X_train = X_train*1000000
 X_val = X_val*1000000
 X_test = X_test*1000000
@@ -250,10 +247,6 @@ Y_test = Y_test*1000000
 
 X_real = X_real*1000000
 
-print(X_train.shape)
-print(X_val.shape)
-print(X_test.shape)
-print(X_real.shape)
 
 X_train = X_train[:,:]
 Y_train = Y_train[:,:]

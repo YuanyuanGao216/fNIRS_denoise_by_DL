@@ -1,15 +1,7 @@
 close all
 clear all
 %% define constants
-global fs_new
-fs_new = 7;
-global rt
-global pt
-rt =   40; %resting time 5.7s
-pt =   512-40; %performance time 65.536s - 5.7s
-seed = 101;
-rng(seed)
-STD = 20;
+define_constants
 %% ----------------add homer2 path----------------------------------
 pathHomer = '../../Tools/homer2_src_v2_3_10202017';
 oldpath = cd(pathHomer);
@@ -39,7 +31,7 @@ for file = 1:length(Files) - 1 % save the last one for testing
     fprintf('fs is %f\n',fs);
     
     %% standard processing wo correction
-    [dc,SD,tInc] = proc_wo_crct(d,SD,t,STD);
+    [dc,SD,tInc] = proc_wo_crct(d,SD,t,STD, OD_thred);
     
     %% visualize the data from one channel and the detected Montion Artifacts
     channel = 2;
@@ -54,7 +46,7 @@ for file = 1:length(Files) - 1 % save the last one for testing
             end
             % scan along the time line
             period = 512;
-            for start_point = 1:4:(length(tInc) - period)
+            for start_point = 1:1:(length(tInc) - period)
                 t_span = start_point : start_point + period -1;
                 % if contains noise, skip
                 if any(tInc(t_span)==0)
@@ -71,7 +63,7 @@ for file = 1:length(Files) - 1 % save the last one for testing
                     % plot an example
                     if figure_flag == 0 && Ch == channel
                         plot_real_data(t,dc,tInc,channel,t_span,Resting_HbO,sim_data_HbO)
-                        save('plot_Resting.mat','t','dc','tInc','channel','t_span','Resting_HbO','sim_data_HbO');
+                        save('Processed_data/plot_Resting.mat','t','dc','tInc','channel','t_span','Resting_HbO','sim_data_HbO');
                     end
                     % if simulate successfully, record in simulated_HbO and _HbR
                     if bio == 1
