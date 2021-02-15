@@ -6,3 +6,5 @@
 *.hdf5
 *.asv
 *.svg
+*Tool*
+*Data*
