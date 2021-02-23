@@ -13,12 +13,14 @@ define_constants
 % amplitude of change
 diff_HbO_list   =   [];
 diff_HbR_list   =   [];
-
+% duration of change
+duration_HbO_list = [];
+duration_HbR_list = [];
 % density of MA, chances of MA to happen along time
 d_MA_list   =   [];
 
 %% load fNIRS file
-DataDir = '../New Datasets/05/motion_artifacts_1';
+DataDir = 'Data';
 Files = dir(fullfile(DataDir,'*.nirs'));
 for file = 1:length(Files) - 1 % save the last one for testing
     name = Files(file).name;
@@ -55,16 +57,12 @@ for file = 1:length(Files) - 1 % save the last one for testing
                 end_point   =   runends(i) - 1;
                 MA_HbO      =   squeeze(dc(start_point:end_point,bio,Ch));
                 diff_Hb     =   max(MA_HbO)-min(MA_HbO);
-%                 if diff_Hb > 100 * 1e-6
-%                     fprintf('file is %s, channel is %d, %dth MA\n',name,Ch,i);
-%                     figure
-%                     plot(squeeze(dc(:,bio,Ch)),'b');hold on;
-%                     plot(start_point:end_point, squeeze(dc(start_point:end_point,bio,Ch)),'r')
-%                 end
                 if bio == 1
                     diff_HbO_list(end+1) = diff_Hb;
+                    duration_HbO_list(end+1) = end_point - start_point;
                 else
                     diff_HbR_list(end+1) = diff_Hb;
+                    duration_HbR_list(end+1) = end_point - start_point;
                 end
             end
         end
@@ -72,5 +70,5 @@ for file = 1:length(Files) - 1 % save the last one for testing
 end
 %%
 % save the diffs and dist. of MA
-save('Processed_data/list.mat','diff_HbO_list','diff_HbR_list','d_MA_list');
+save('Processed_data/list.mat','diff_HbO_list','diff_HbR_list','d_MA_list','duration_HbO_list','duration_HbR_list');
 

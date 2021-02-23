@@ -4,7 +4,6 @@
 plot_real_data
 plot_sim_data
 
-plot_sens
 %% Figure 4
 load('Processed_data/Testing_Spline.mat')
 load('Processed_data/Testing_Wavelet01.mat')

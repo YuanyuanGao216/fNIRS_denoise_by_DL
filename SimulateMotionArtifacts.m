@@ -19,7 +19,7 @@ t = (1:tp)/fs_new;
 n_MA_list = round(d_MA_list * tp);
 n_list = n_MA_list(randi(length(n_MA_list),n_sample,1));
 n_list = n_list';
-% they are eaither peak or shift
+% they are either peak or shift
 peak_n_list = zeros(size(n_list));
 shift_n_list = zeros(size(n_list));
 for i = 1:length(n_list)
@@ -32,13 +32,13 @@ s = zeros(1,tp);
 s((rt):512:tp) = 1;
 
 %% HbO
-noised_HRF_HbO = zeros(size(simulated_HbO));
-noise_HbO = zeros(size(simulated_HbO));
-HRF_profile_HbO = zeros(size(simulated_HbO));
+noised_HRF_HbO_matrix = zeros(size(simulated_HbO));
+noise_HbO_matrix = zeros(size(simulated_HbO));
+HRF_profile_HbO_matrix = zeros(size(simulated_HbO));
 
-noised_HRF_HbR = zeros(size(simulated_HbR));
-noise_HbR = zeros(size(simulated_HbR));
-HRF_profile_HbR = zeros(size(simulated_HbR));
+noised_HRF_HbR_matrix = zeros(size(simulated_HbR));
+noise_HbR_matrix = zeros(size(simulated_HbR));
+HRF_profile_HbR_matrix = zeros(size(simulated_HbR));
 
 for i = 1:n_sample
     Resting_HbO = simulated_HbO(i,:);
@@ -86,13 +86,13 @@ for i = 1:n_sample
         plot_sim_data(HRFs_HbO,noise_HbO,noised_HRF_HbO,Resting_HbO)
     end
     %% save the data
-    noised_HRF_HbO(i,:)     =   noised_HRF_HbO;
-    noise_HbO(i,:)          =   noise_HbO;
-    HRF_profile_HbO(i,:)    =   HRFs_HbO;
+    noised_HRF_HbO_matrix(i,:)     =   noised_HRF_HbO;
+    noise_HbO_matrix(i,:)          =   noise_HbO;
+    HRF_profile_HbO_matrix(i,:)    =   HRFs_HbO;
     
-    noised_HRF_HbR(i,:)     =   noised_HRF_HbR;
-    noise_HbR(i,:)          =   noise_HbR;
-    HRF_profile_HbR(i,:)    =   HRFs_HbR;
+    noised_HRF_HbR_matrix(i,:)     =   noised_HRF_HbR;
+    noise_HbR_matrix(i,:)          =   noise_HbR;
+    HRF_profile_HbR_matrix(i,:)    =   HRFs_HbR;
 end
 
 %% train, val, test 8:1:1
@@ -103,17 +103,17 @@ train_idx   =   p(1:n_train);
 val_idx     =   p(n_train+1:n_train+n_val);
 test_idx    =   p(n_train+n_val+1:end);
 
-HRF_train   =   [HRF_profile_HbO(train_idx,:);  HRF_profile_HbR(train_idx,:)];
-HRF_val     =   [HRF_profile_HbO(val_idx,:);    HRF_profile_HbR(val_idx,:)];
-HRF_test    =   [HRF_profile_HbO(test_idx,:);   HRF_profile_HbR(test_idx,:)];
+HRF_train   =   [HRF_profile_HbO_matrix(train_idx,:);  HRF_profile_HbR_matrix(train_idx,:)];
+HRF_val     =   [HRF_profile_HbO_matrix(val_idx,:);    HRF_profile_HbR_matrix(val_idx,:)];
+HRF_test    =   [HRF_profile_HbO_matrix(test_idx,:);   HRF_profile_HbR_matrix(test_idx,:)];
 
-HRF_train_noised    =   [noised_HRF_HbO(train_idx,:);   noised_HRF_HbR(train_idx,:)];
-HRF_val_noised      =   [noised_HRF_HbO(val_idx,:);     noised_HRF_HbR(val_idx,:)];
-HRF_test_noised     =   [noised_HRF_HbO(test_idx,:);    noised_HRF_HbR(test_idx,:)];
+HRF_train_noised    =   [noised_HRF_HbO_matrix(train_idx,:);   noised_HRF_HbR_matrix(train_idx,:)];
+HRF_val_noised      =   [noised_HRF_HbO_matrix(val_idx,:);     noised_HRF_HbR_matrix(val_idx,:)];
+HRF_test_noised     =   [noised_HRF_HbO_matrix(test_idx,:);    noised_HRF_HbR_matrix(test_idx,:)];
 
-Noise_train     =   [noise_HbO(train_idx,:);    noise_HbR(train_idx,:)];
-Noise_val       =   [noise_HbO(val_idx,:);      noise_HbO(val_idx,:)];
-Noise_test      =   [noise_HbO(test_idx,:);     noise_HbO(test_idx,:)];
+Noise_train     =   [noise_HbO_matrix(train_idx,:);    noise_HbR_matrix(train_idx,:)];
+Noise_val       =   [noise_HbO_matrix(val_idx,:);      noise_HbR_matrix(val_idx,:)];
+Noise_test      =   [noise_HbO_matrix(test_idx,:);     noise_HbR_matrix(test_idx,:)];
 
 Resting_train   =   [simulated_HbO(train_idx,:);  simulated_HbR(train_idx,:)];
 Resting_val     =   [simulated_HbO(val_idx,:);    simulated_HbR(val_idx,:)];

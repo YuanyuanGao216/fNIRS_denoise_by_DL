@@ -35,7 +35,7 @@ fclose('all')
 filename = 'Processed_data/Sensitivity.txt';
 Sensitivity_file = fopen(filename,'w');
 %%
-sigma_PCA_list = 0.51:0.04:0.99;
+sigma_PCA_list = 0.51:0.01:0.99;
 mse_list = zeros(length(sigma_PCA_list),m/2);
 n_list = zeros(length(sigma_PCA_list),m/2);
 for j = 1:length(sigma_PCA_list)
@@ -45,7 +45,7 @@ for j = 1:length(sigma_PCA_list)
         dc_HbO              =   HbO_noised(i,:);
         dc_HbR              =   HbR_noised(i,:);
         dc                  =   [dc_HbO;dc_HbR]';
-        [dc_avg,n_MA]       =   proc_PCA(dc, s, SD1, t, tIncMan,STD, OD_thred, sigma);
+        [dc_avg,n_MA]       =   proc_PCA(dc, s, SD1, t, tIncMan, STD, OD_thred, sigma);
         dc_predict          =   [dc_avg(:,1)', dc_avg(:,2)'];
         n_list(j,i)         =   n_MA;
         dc_real             =   [HbO(i,1:512),HbR(i,1:512)];
@@ -110,7 +110,7 @@ end
 
 
 %%
-iqr_Wavelet = 0.1:0.1:0.4;
+iqr_Wavelet = 0.1:0.05:0.4;
 mse_list = zeros(length(iqr_Wavelet),m/2);
 n_list = zeros(length(iqr_Wavelet),m/2);
 for j = 1: length(iqr_Wavelet)

@@ -6,5 +6,9 @@
 *.hdf5
 *.asv
 *.svg
-*Tool*
+*Tools*
 *Data*
+*Processed_data*
+*networks*
+*Figures*
+tmp*

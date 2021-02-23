@@ -20,6 +20,8 @@ HbO_Kalman  = [];
 HbR_Kalman  = [];
 HbO_PCA97   = [];
 HbR_PCA97   = [];
+HbO_PCA99   = [];
+HbR_PCA99   = [];
 HbO_Cbsi    = [];
 HbR_Cbsi    = [];
 
@@ -27,6 +29,7 @@ n_Spline = 0;
 n_Wavelet01 = 0;
 n_Kalman = 0;
 n_PCA97 = 0;
+n_PCA99 = 0;
 n_Cbsi = 0;
 
 define_constants
@@ -79,7 +82,24 @@ for i = 1:m/2
     n_PCA97             =   n_PCA97 + n_MA;
 end
 save('Processed_data/Testing_PCA97.mat','HbO_PCA97','HbR_PCA97','n_PCA97')
+%% PCA97
+sigma   =  0.99;
+T_PCA99 =   0;
 
+for i = 1:m/2
+    dc_HbO          =   HbO_noised(i,:);
+    dc_HbR          =   HbR_noised(i,:);
+    dc              =   [dc_HbO;dc_HbR]';
+    
+    tic
+    [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
+    T_PCA99         =   T_PCA99 + toc;
+    
+    HbO_PCA99(end+1,:)  = dc_avg(:,1)';
+    HbR_PCA99(end+1,:)  = dc_avg(:,2)';
+    n_PCA99             =   n_PCA99 + n_MA;
+end
+save('Processed_data/Testing_PCA99.mat','HbO_PCA99','HbR_PCA99','n_PCA99')
 %% Kalman
 T_Kalman = 0;
 
@@ -169,6 +189,7 @@ fprintf(time_file,'Time for Spline is %f\n',T_Spline);
 fprintf(time_file,'Time for Wavelet01 is %f\n',T_Wavelet01);
 fprintf(time_file,'Time for Kalman is %f\n',T_Kalman);
 fprintf(time_file,'Time for PCA97 is %f\n',T_PCA97);
+fprintf(time_file,'Time for PCA99 is %f\n',T_PCA99);
 fprintf(time_file,'Time for Cbsi is %f\n',T_Cbsi);
 % % T_Spline = 8.637879;
 % % T_Wavelet05 = 1111.117784;
