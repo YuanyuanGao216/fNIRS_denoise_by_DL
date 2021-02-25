@@ -18,7 +18,7 @@ n_files =   length(Files);
 %% define the variables to be calculated
 
 % save No. of MAs for each files n_files X [n_MA_no_correction,dc_avg_PCA97,n_MA_Spline99,n_MA_Wavelet01,]
-MA_matrix    =   zeros(n_files,6);
+MA_matrix    =   zeros(n_files,7);
 
 for file = 1:n_files
     name = Files(file).name;
@@ -62,35 +62,41 @@ for file = 1:n_files
     n_MA_no_crct = count_MA(tInc);
     %% standard processing with PCA97
     sigma           =   0.97;
-    [dc_PCA97,~]                 =   proc_PCA(dc,s,SD,t,tIncMan,STD,OD_thred,sigma);
-    [dc_act_PCA97,n_MA_PCA97]    =   proc_PCA(dc_act,s,SD,t,tIncMan,STD,OD_thred,sigma);
+    [dc_PCA97,n_MA_PCA97]                 =   proc_PCA(dc,s,SD,t,tIncMan,STD,OD_thred,sigma);
+    [dc_act_PCA97,~]    =   proc_PCA(dc_act,s,SD,t,tIncMan,STD,OD_thred,sigma);
+    %% standard processing with PCA99
+    sigma           =   0.99;
+    [dc_PCA99,n_MA_PCA99]                 =   proc_PCA(dc,s,SD,t,tIncMan,STD,OD_thred,sigma);
+    [dc_act_PCA99,~]    =   proc_PCA(dc_act,s,SD,t,tIncMan,STD,OD_thred,sigma);
     %% standard processing with Spline 99
     p               =   0.99;
-    [dc_Spline,~]                   =   proc_Spline(dc,s,SD,t,tIncMan,STD,OD_thred,p);
-    [dc_act_Spline,n_MA_Spline]     =   proc_Spline(dc_act,s,SD,t,tIncMan,STD,OD_thred,p);
+    [dc_Spline,n_MA_Spline]                   =   proc_Spline(dc,s,SD,t,tIncMan,STD,OD_thred,p);
+    [dc_act_Spline,~]     =   proc_Spline(dc_act,s,SD,t,tIncMan,STD,OD_thred,p);
     %% standard processing with Wavelet01
     alpha                   =   0.1;
-    [dc_Wavelet,~]                    =   proc_Wavelet(dc,s,SD,t,tIncMan,STD,OD_thred,alpha);
-    [dc_act_Wavelet,n_MA_Wavelet]     =   proc_Wavelet(dc_act,s,SD,t,tIncMan,STD,OD_thred,alpha);
+    [dc_Wavelet,n_MA_Wavelet]                    =   proc_Wavelet(dc,s,SD,t,tIncMan,STD,OD_thred,alpha);
+    [dc_act_Wavelet,~]     =   proc_Wavelet(dc_act,s,SD,t,tIncMan,STD,OD_thred,alpha);
     %% hmrKalman
-    [dc_Kalman,~]                     =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
-    [dc_act_Kalman,n_MA_Kalman]       =   proc_Kalman(dc_act,s,SD,t,tIncMan,OD_thred,STD);
+    [dc_Kalman,n_MA_Kalman]                     =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
+    [dc_act_Kalman,~]       =   proc_Kalman(dc_act,s,SD,t,tIncMan,OD_thred,STD);
     %% hmrCbsi
-    [dc_Cbsi,~]                     =   proc_Cbsi(dc,s,SD,t,tIncMan,OD_thred,STD);
-    [dc_act_Cbsi,n_MA_Cbsi]         =   proc_Cbsi(dc_act,s,SD,t,tIncMan,OD_thred,STD);
+    [dc_Cbsi,n_MA_Cbsi]                     =   proc_Cbsi(dc,s,SD,t,tIncMan,OD_thred,STD);
+    [dc_act_Cbsi,~]         =   proc_Cbsi(dc_act,s,SD,t,tIncMan,OD_thred,STD);
     %% write the processed data
-    MA_matrix(file,:)               =   [n_MA_no_crct,n_MA_PCA97,n_MA_Spline,n_MA_Wavelet,n_MA_Kalman,n_MA_Cbsi];
+    MA_matrix(file,:)               =   [n_MA_no_crct, n_MA_Spline,n_MA_Wavelet,n_MA_Kalman, n_MA_PCA99,n_MA_PCA97,n_MA_Cbsi];
     net_input(file).dc_act          =   dc_act;
     net_input(file).dc              =   dc;
     Proc_data(file).HRF             =   HRFs;
     Proc_data(file).dc_no_crct      =   dc_no_crct;
     Proc_data(file).dc_PCA97        =   dc_PCA97;
+    Proc_data(file).dc_PCA99        =   dc_PCA99;
     Proc_data(file).dc_Spline       =   dc_Spline;
     Proc_data(file).dc_Wavelet      =   dc_Wavelet;
     Proc_data(file).dc_Kalman       =   dc_Kalman;
     Proc_data(file).dc_Cbsi         =   dc_Cbsi;
     Proc_data(file).dc_act_no_crct  =   dc_act_no_crct;
     Proc_data(file).dc_act_PCA97    =   dc_act_PCA97;
+    Proc_data(file).dc_act_PCA99    =   dc_act_PCA99;
     Proc_data(file).dc_act_Spline   =   dc_act_Spline;
     Proc_data(file).dc_act_Wavelet  =   dc_act_Wavelet;
     Proc_data(file).dc_act_Kalman   =   dc_act_Kalman;

@@ -33,52 +33,6 @@ class Dataset(tordata.Dataset):
 
 # %% define nn models
 
-class Net_4layers(nn.Module):
-    def __init__(self):
-        super(Net_4layers, self).__init__()
-        self.conv1 = nn.Conv1d(1, 32, 11,padding = 5)
-        self.conv2 = nn.Conv1d(32,32,3,padding = 1)
-        self.conv3 = nn.Conv1d(32,32,3,padding = 1)
-        self.conv4 = nn.Conv1d(32,32,3,padding = 1)
-        self.conv5 = nn.Conv1d(32,1,3,padding = 1)
-        self.pool = nn.MaxPool1d(2,padding = 0)
-        self.up = nn.Upsample(scale_factor=2)
-        
-    def forward(self, x):
-        b_s, f_n = x.size()
-        x = x.view(b_s, 1, f_n)
-        x1 = x[:, :, :512]
-        x2 = x[:, :, 512:]
-#         print('input layer:')
-#         print(x1.size())
-#         print(x2.size())
-
-        x1 = self.pool(F.relu(self.conv1(x1)))
-        x2 = self.pool(F.relu(self.conv1(x2)))
-#         print('1st layer:')
-#         print(x1.size())
-#         print(x2.size())
-        
-        x1 = self.pool(F.relu(self.conv2(x1)))
-#        print('2nd layer:')
-#        print(x1.size())
-        x2 = self.pool(F.relu(self.conv2(x2)))
-        x1 = self.up(F.relu(self.conv3(x1)))
-#        print('3rd layer:')
-#        print(x1.size())
-        x2 = self.up(F.relu(self.conv3(x2)))
-        x1 = self.up(F.relu(self.conv4(x1)))
-#        print('4th layer:')
-#        print(x1.size())
-        x2 = self.up(F.relu(self.conv4(x2)))
-        x1 = self.conv5(x1)
-#        print('5th layer:')
-#        print(x1.size())
-        x2 = self.conv5(x2)
-        x = torch.cat((x1, x2), dim=2)
-        b_s, _, f_n = x.size()
-        x = x.view(b_s, -1)
-        return x
 class Net_8layers(nn.Module):
     def __init__(self):
         super(Net_8layers, self).__init__()
@@ -246,6 +200,8 @@ if __name__ == '__main__':
     
     X_real = np.concatenate(X_real, axis=0)
     X_real_act = np.concatenate(X_real_act, axis=0)
+    savefilepath = "Processed_data/number_array.mat"
+    scipy.io.savemat(savefilepath,{'number_array': number_array})
     # %% double check the magnitude 
     X_train = X_train*1000000
     X_val = X_val*1000000
@@ -305,189 +261,185 @@ if __name__ == '__main__':
             num_workers=2)
     # %% trian and validate
     data_loaders = {"train": trainloader, "val": valloader}
-    model = ['8layers']
-    
+    # model = ['8layers']
+    model_name = '8layers'
     n_epochs = 100
     print('start')
-    for model_name in model:
-        print('Model:', model_name)
-        if model_name == '4layers':
-            net = Net_4layers().cuda()
-        elif model_name == '8layers':
-            net = Net_8layers().cuda()
-        train_loss1 = []
-        val_loss1 = []
-        train_loss2 = []
-        val_loss2 = []
-        train_loss3 = []
-        val_loss3 = []
-        train_loss = []
-        val_loss = []
-        optimizer = optim.Adam(net.parameters(), lr=0.0001)
-        scheduler = StepLR(optimizer, step_size = 25, gamma=0.1)
-        lowest_val_loss = 1e6;
-        hdf5_filepath = "networks/" + model_name
-        for epoch in range(n_epochs):  # loop over the dataset multiple times
-            print('Epoch {}/{}'.format(epoch, n_epochs - 1))
-            print('-' * 10)
-            for phase in ['train','val']:
+    
+    net = Net_8layers().cuda()
+    train_loss1 = []
+    val_loss1 = []
+    train_loss2 = []
+    val_loss2 = []
+    train_loss3 = []
+    val_loss3 = []
+    train_loss = []
+    val_loss = []
+    optimizer = optim.Adam(net.parameters(), lr=0.0001)
+    scheduler = StepLR(optimizer, step_size = 25, gamma=0.1)
+    lowest_val_loss = 1e6;
+    hdf5_filepath = "networks/8layers"
+    for epoch in range(n_epochs):  # loop over the dataset multiple times
+        print('Epoch {}/{}'.format(epoch, n_epochs - 1))
+        print('-' * 10)
+        for phase in ['train','val']:
+            if phase == 'train':
+                net.train()  # Set model to training mode
+            else:
+                net.eval()
+            running_loss1 = 0.0
+            running_loss2 = 0.0
+            running_loss3 = 0.0
+            running_loss = 0.0
+            for i, data in enumerate(data_loaders[phase], 0):
+                # get the inputs; data is a list of [inputs, labels]
+                inputs, y_true = data
+                # zero the parameter gradients
+                optimizer.zero_grad()
+                # forward + backward + optimize
+                outputs = net(inputs.cuda().float())
+                outputs = outputs.double()
+                mse_loss = nn.MSELoss()
+                loss1 = mse_loss(outputs, y_true.cuda())
+                loss2 = SNR_loss(outputs)
+                loss3 = std_loss(outputs)
+                
+#                 loss = loss1 + 0.01 *(loss2 + loss3)
+                loss = loss1 + 1 * loss2 + 100*loss3
+
                 if phase == 'train':
-                    net.train()  # Set model to training mode
-                else:
-                    net.eval()
-                running_loss1 = 0.0
-                running_loss2 = 0.0
-                running_loss3 = 0.0
-                running_loss = 0.0
-                for i, data in enumerate(data_loaders[phase], 0):
-                    # get the inputs; data is a list of [inputs, labels]
-                    inputs, y_true = data
-                    # zero the parameter gradients
-                    optimizer.zero_grad()
-                    # forward + backward + optimize
-                    outputs = net(inputs.cuda().float())
-                    outputs = outputs.double()
-                    mse_loss = nn.MSELoss()
-                    loss1 = mse_loss(outputs, y_true.cuda())
-                    loss2 = SNR_loss(outputs)
-                    loss3 = std_loss(outputs)
-                    
-    #                 loss = loss1 + 0.01 *(loss2 + loss3)
-                    loss = loss1 + 1 * loss2 + 10*loss3
+                    loss.backward()
+                    optimizer.step()
+                running_loss1 += loss1.item()
+                running_loss2 += loss2.item()
+                running_loss3 += loss3.item()
+                running_loss += loss.item()
+            epoch_loss1 = running_loss1 / len(data_loaders[phase])
+            epoch_loss2 = running_loss2 / len(data_loaders[phase])
+            epoch_loss3 = running_loss3 / len(data_loaders[phase])
+            epoch_loss = running_loss / len(data_loaders[phase])
+            if phase == 'train':
+                train_loss1.append(epoch_loss1)
+                train_loss2.append(epoch_loss2)
+                train_loss3.append(epoch_loss3)
+                train_loss.append(epoch_loss)  # Set model to training mode
+            else:
+                val_loss1.append(epoch_loss1)
+                val_loss2.append(epoch_loss2)
+                val_loss3.append(epoch_loss3)
+                val_loss.append(epoch_loss)
+                if epoch_loss < lowest_val_loss:
+                    lowest_val_loss = epoch_loss
+                    torch.save(net.state_dict(), hdf5_filepath)
+            print('{} Loss: {:.5f};  loss1: {:.5f};  loss2: {:.5f}；loss3: {:.5f}'.format(
+                    phase, epoch_loss, epoch_loss1, epoch_loss2, epoch_loss3))
+        scheduler.step()
+
+    print('Finished Training')
+    plt.figure()
+    vl, = plt.plot(val_loss1,'r')
+    tl, = plt.plot(train_loss1,'b')
+    plt.legend([tl,vl],['training loss', 'validation loss'],)
+    plt.title('loss1')
+    figurepath = "Figures/" + model_name+"_1"+".png"
+    plt.savefig(figurepath, transparent=True)
     
-                    if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
-                    running_loss1 += loss1.item()
-                    running_loss2 += loss2.item()
-                    running_loss3 += loss3.item()
-                    running_loss += loss.item()
-                epoch_loss1 = running_loss1 / len(data_loaders[phase])
-                epoch_loss2 = running_loss2 / len(data_loaders[phase])
-                epoch_loss3 = running_loss3 / len(data_loaders[phase])
-                epoch_loss = running_loss / len(data_loaders[phase])
-                if phase == 'train':
-                    train_loss1.append(epoch_loss1)
-                    train_loss2.append(epoch_loss2)
-                    train_loss3.append(epoch_loss3)
-                    train_loss.append(epoch_loss)  # Set model to training mode
-                else:
-                    val_loss1.append(epoch_loss1)
-                    val_loss2.append(epoch_loss2)
-                    val_loss3.append(epoch_loss3)
-                    val_loss.append(epoch_loss)
-                    if epoch_loss < lowest_val_loss:
-                        lowest_val_loss = epoch_loss
-                        torch.save(net.state_dict(), hdf5_filepath)
-                print('{} Loss: {:.5f};  loss1: {:.5f};  loss2: {:.5f}；loss3: {:.5f}'.format(
-                        phase, epoch_loss, epoch_loss1, epoch_loss2, epoch_loss3))
-            scheduler.step()
+    plt.figure()
+    vl, = plt.plot(val_loss2,'r')
+    tl, = plt.plot(train_loss2,'b')
+    plt.legend([tl,vl],['training loss', 'validation loss'],)
+    plt.title('loss2')
+    figurepath = "Figures/" + model_name+"_2"+".png"
+    plt.savefig(figurepath, transparent=True)
     
-        print('Finished Training')
-        plt.figure()
-        vl, = plt.plot(val_loss1,'r')
-        tl, = plt.plot(train_loss1,'b')
-        plt.legend([tl,vl],['training loss', 'validation loss'],)
-        plt.title('loss1')
-        figurepath = "Figures/" + model_name+"_1"+".png"
-        plt.savefig(figurepath, transparent=True)
-        
-        plt.figure()
-        vl, = plt.plot(val_loss2,'r')
-        tl, = plt.plot(train_loss2,'b')
-        plt.legend([tl,vl],['training loss', 'validation loss'],)
-        plt.title('loss2')
-        figurepath = "Figures/" + model_name+"_2"+".png"
-        plt.savefig(figurepath, transparent=True)
-        
-        plt.figure()
-        vl, = plt.plot(val_loss3,'r')
-        tl, = plt.plot(train_loss3,'b')
-        plt.legend([tl,vl],['training loss', 'validation loss'],)
-        plt.title('loss3')
-        figurepath = "Figures/" + model_name+"_3"+".png"
-        plt.savefig(figurepath, transparent=True)
-        
-        plt.figure()
-        vl, = plt.plot(val_loss,'r')
-        tl, = plt.plot(train_loss,'b')
-        plt.legend([tl,vl],['training loss', 'validation loss'],)
-        plt.title('total loss')
-        figurepath = "Figures/" + model_name+"_all"+".png"
-        plt.savefig(figurepath, transparent=True)
-        print('Finished Fig saving')
+    plt.figure()
+    vl, = plt.plot(val_loss3,'r')
+    tl, = plt.plot(train_loss3,'b')
+    plt.legend([tl,vl],['training loss', 'validation loss'],)
+    plt.title('loss3')
+    figurepath = "Figures/" + model_name+"_3"+".png"
+    plt.savefig(figurepath, transparent=True)
     
-        trainlosspath = "Processed_data/train_loss_" + model_name+".txt"
-        np.savetxt(trainlosspath, np.array(train_loss), fmt="%s")
-        vallosspath = "Processed_data/val_loss_" + model_name+".txt"
-        np.savetxt(vallosspath, np.array(val_loss), fmt="%s")
-        print('Finished writing loss files')
+    plt.figure()
+    vl, = plt.plot(val_loss,'r')
+    tl, = plt.plot(train_loss,'b')
+    plt.legend([tl,vl],['training loss', 'validation loss'],)
+    plt.title('total loss')
+    figurepath = "Figures/" + model_name+"_all"+".png"
+    plt.savefig(figurepath, transparent=True)
+    print('Finished Fig saving')
+
+    trainlosspath = "Processed_data/train_loss_" + model_name+".txt"
+    np.savetxt(trainlosspath, np.array(train_loss), fmt="%s")
+    vallosspath = "Processed_data/val_loss_" + model_name+".txt"
+    np.savetxt(vallosspath, np.array(val_loss), fmt="%s")
+    print('Finished writing loss files')
+
+    net.load_state_dict(torch.load(hdf5_filepath))
+    print('loaded nn file')
     
-        net.load_state_dict(torch.load(hdf5_filepath))
-        print('loaded nn file')
+    
+    Y_test = []
+    for i, data in enumerate(testloader, 0):
+        inputs = data[0]
+        outputs = net(inputs.cuda().float())
+        Y_test.append(outputs.cpu().data.numpy())
         
-        
-        Y_test = []
-        for i, data in enumerate(testloader, 0):
-            inputs = data[0]
-            outputs = net(inputs.cuda().float())
-            Y_test.append(outputs.cpu().data.numpy())
-            
-        
-        Y_test = np.concatenate(Y_test, axis=0)
-        Y_test = Y_test/1000000
-        savefilepath = "Processed_data/Test_NN_" + model_name+".mat"
-        scipy.io.savemat(savefilepath,{'Y_test': Y_test})
-        
-        print('Y_test shape is ',Y_test.shape)
-        
-        plt.figure()
-        X_test_example = X_test[0,:];
-        Y_test_example = Y_test[0,:]*1000000;
-        X, = plt.plot(X_test_example,'b')
-        Y, = plt.plot(Y_test_example,'r')
-        figurepath = "Figures/Y_test_example.png"
-        plt.savefig(figurepath, transparent=True)
-        
-        Y_real = []
-        for i, data in enumerate(realloader, 0):
-            inputs = data[0]
-            outputs = net(inputs.cuda().float())
-            Y_real.append(outputs.cpu().data.numpy())
-        Y_real = np.concatenate(Y_real, axis=0)
-        Y_real = Y_real/1000000
-        savefilepath = "Processed_data/Real_NN_" + model_name+".mat"
-        scipy.io.savemat(savefilepath,{'Y_real': Y_real})
-        
-        print('Y_real shape is ',Y_real.shape)
-        
-        plt.figure()
-        X_real_example = X_real[0,:]
-        Y_real_example = Y_real[0,:]*1000000
-        X, = plt.plot(X_real_example,'b')
-        Y, = plt.plot(Y_real_example,'r')
-        figurepath = "Figures/Y_real_example.png"
-        plt.savefig(figurepath, transparent=True)
-        
-        Y_real_act = []
-        for i, data in enumerate(realloader_act, 0):
-            inputs = data[0]
-            outputs = net(inputs.cuda().float())
-            Y_real_act.append(outputs.cpu().data.numpy())
-        Y_real_act = np.concatenate(Y_real_act, axis=0)
-        Y_real_act = Y_real_act/1000000
-        savefilepath = "Processed_data/Real_NN_" + model_name+"_act.mat"
-        scipy.io.savemat(savefilepath,{'Y_real_act': Y_real_act})
-        
-        plt.figure()
-        X_real_example = X_real_act[0,:]
-        Y_real_example = Y_real_act[0,:]*1000000
-        X, = plt.plot(X_real_example,'b')
-        Y, = plt.plot(Y_real_example,'r')
-        figurepath = "Figures/Y_real_example_act.png"
-        plt.savefig(figurepath, transparent=True)
-        print('Y_real_act shape is ',Y_real_act.shape)
-        
-        
-        
-        print('Saved predited data')
+    
+    Y_test = np.concatenate(Y_test, axis=0)
+    Y_test = Y_test/1000000
+    savefilepath = "Processed_data/Test_NN_" + model_name+".mat"
+    scipy.io.savemat(savefilepath,{'Y_test': Y_test})
+    
+    print('Y_test shape is ',Y_test.shape)
+    
+    plt.figure()
+    X_test_example = X_test[0,:];
+    Y_test_example = Y_test[0,:]*1000000;
+    X, = plt.plot(X_test_example,'b')
+    Y, = plt.plot(Y_test_example,'r')
+    figurepath = "Figures/Y_test_example.png"
+    plt.savefig(figurepath, transparent=True)
+    
+    Y_real = []
+    for i, data in enumerate(realloader, 0):
+        inputs = data[0]
+        outputs = net(inputs.cuda().float())
+        Y_real.append(outputs.cpu().data.numpy())
+    Y_real = np.concatenate(Y_real, axis=0)
+    Y_real = Y_real/1000000
+    savefilepath = "Processed_data/Real_NN_" + model_name+".mat"
+    scipy.io.savemat(savefilepath,{'Y_real': Y_real})
+    
+    print('Y_real shape is ',Y_real.shape)
+    
+    plt.figure()
+    X_real_example = X_real[0,:]
+    Y_real_example = Y_real[0,:]*1000000
+    X, = plt.plot(X_real_example,'b')
+    Y, = plt.plot(Y_real_example,'r')
+    figurepath = "Figures/Y_real_example.png"
+    plt.savefig(figurepath, transparent=True)
+    
+    Y_real_act = []
+    for i, data in enumerate(realloader_act, 0):
+        inputs = data[0]
+        outputs = net(inputs.cuda().float())
+        Y_real_act.append(outputs.cpu().data.numpy())
+    Y_real_act = np.concatenate(Y_real_act, axis=0)
+    Y_real_act = Y_real_act/1000000
+    savefilepath = "Processed_data/Real_NN_" + model_name+"_act.mat"
+    scipy.io.savemat(savefilepath,{'Y_real_act': Y_real_act})
+    
+    plt.figure()
+    X_real_example = X_real_act[0,:]
+    Y_real_example = Y_real_act[0,:]*1000000
+    X, = plt.plot(X_real_example,'b')
+    Y, = plt.plot(Y_real_example,'r')
+    figurepath = "Figures/Y_real_example_act.png"
+    plt.savefig(figurepath, transparent=True)
+    print('Y_real_act shape is ',Y_real_act.shape)
+    
+    
+    
+    print('Saved predited data')

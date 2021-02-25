@@ -11,27 +11,7 @@ load('Processed_data/SimulateData.mat','HRF_test_noised')
 [m,n] = size(HRF_test_noised);
 HbO_noised = HRF_test_noised(1:m/2,:);
 HbR_noised = HRF_test_noised(m/2+1:end,:);
-%% define variables to be calulate
-HbO_Spline  = [];
-HbR_Spline  = [];
-HbO_Wavelet01 = [];
-HbR_Wavelet01 = [];
-HbO_Kalman  = [];
-HbR_Kalman  = [];
-HbO_PCA97   = [];
-HbR_PCA97   = [];
-HbO_PCA99   = [];
-HbR_PCA99   = [];
-HbO_Cbsi    = [];
-HbR_Cbsi    = [];
-
-n_Spline = 0;
-n_Wavelet01 = 0;
-n_Kalman = 0;
-n_PCA97 = 0;
-n_PCA99 = 0;
-n_Cbsi = 0;
-
+%% define variables 
 define_constants
 
 %% 
@@ -46,159 +26,187 @@ s  = zeros(1,length(t));
 s((rt):512:length(t)) = 1;
 tIncMan=ones(size(t))';
 SD = SD1;
-%% Cbsi
-T_Cbsi = 0;
+% %% Cbsi
+% HbO_Cbsi    = [];
+% HbR_Cbsi    = [];
+% n_Cbsi = 0;
+% T_Cbsi = 0;
+% 
+% for i = 1:m/2
+%     dc_HbO          =   HbO_noised(i,:);
+%     dc_HbR          =   HbR_noised(i,:);
+%     dc              =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]   =   proc_Cbsi(dc,s,SD,t,tIncMan,OD_thred,STD);
+%     T_Cbsi          =   T_Cbsi + toc;
+%     
+%     HbO_Cbsi(end+1,:) = dc_avg(:,1)';
+%     HbR_Cbsi(end+1,:) = dc_avg(:,2)';
+%     n_Cbsi          =   n_Cbsi + n_MA;
+% end
+% save('Processed_data/Testing_Cbsi.mat','HbO_Cbsi','HbR_Cbsi','n_Cbsi')
+% 
+% %% PCA97
+% HbO_PCA97   = [];
+% HbR_PCA97   = [];
+% n_PCA97 = 0;
+% sigma   =  0.97;
+% T_PCA97 =   0;
+% 
+% for i = 1:m/2
+%     dc_HbO          =   HbO_noised(i,:);
+%     dc_HbR          =   HbR_noised(i,:);
+%     dc              =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
+%     T_PCA97         =   T_PCA97 + toc;
+%     
+%     HbO_PCA97(end+1,:)  = dc_avg(:,1)';
+%     HbR_PCA97(end+1,:)  = dc_avg(:,2)';
+%     n_PCA97             =   n_PCA97 + n_MA;
+% end
+% save('Processed_data/Testing_PCA97.mat','HbO_PCA97','HbR_PCA97','n_PCA97')
+% %% PCA99
+% HbO_PCA99   = [];
+% HbR_PCA99   = [];
+% n_PCA99 = 0;
+% sigma   =  0.99;
+% T_PCA99 =   0;
+% 
+% for i = 1:m/2
+%     dc_HbO          =   HbO_noised(i,:);
+%     dc_HbR          =   HbR_noised(i,:);
+%     dc              =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
+%     T_PCA99         =   T_PCA99 + toc;
+%     
+%     HbO_PCA99(end+1,:)  = dc_avg(:,1)';
+%     HbR_PCA99(end+1,:)  = dc_avg(:,2)';
+%     n_PCA99             =   n_PCA99 + n_MA;
+% end
+% save('Processed_data/Testing_PCA99.mat','HbO_PCA99','HbR_PCA99','n_PCA99')
+% %% Kalman
+% HbO_Kalman  = [];
+% HbR_Kalman  = [];
+% n_Kalman = 0;
+% T_Kalman = 0;
+% 
+% for i = 1:m/2
+%     dc_HbO          =   HbO_noised(i,:);
+%     dc_HbR          =   HbR_noised(i,:);
+%     dc              =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]   =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
+%     T_Kalman        =   T_Kalman + toc;
+%     
+%     HbO_Kalman(end+1,:)  = dc_avg(:,1)';
+%     HbR_Kalman(end+1,:)  = dc_avg(:,2)';
+%     n_Kalman             =   n_Kalman + n_MA;
+% end
+% save('Processed_data/Testing_Kalman.mat','HbO_Kalman','HbR_Kalman','n_Kalman')
+% %% Spline
+% HbO_Spline  = [];
+% HbR_Spline  = [];
+% n_Spline = 0;
+% T_Spline =   0;
+% p       =   0.99;
+% 
+% for i = 1:m/2
+%     dc_HbO              =   HbO_noised(i,:);
+%     dc_HbR              =   HbR_noised(i,:);
+%     dc                  =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]       =   proc_Spline(dc, s, SD1, t, tIncMan, STD, OD_thred,p);
+%     T_Spline            =   T_Spline + toc;
+%     
+%     HbO_Spline(end+1,:)  = dc_avg(:,1)';
+%     HbR_Spline(end+1,:)  = dc_avg(:,2)';
+%     n_Spline             =   n_Spline + n_MA;
+% end
+% save('Processed_data/Testing_Spline.mat','HbO_Spline','HbR_Spline','n_Spline')
 
-for i = 1:m/2
-    dc_HbO          =   HbO_noised(i,:);
-    dc_HbR          =   HbR_noised(i,:);
-    dc              =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]   =   proc_Cbsi(dc,s,SD,t,tIncMan,OD_thred,STD);
-    T_Cbsi          =   T_Cbsi + toc;
-    
-    HbO_Cbsi(end+1,:) = dc_avg(:,1)';
-    HbR_Cbsi(end+1,:) = dc_avg(:,2)';
-    n_PCA97          =   n_PCA97 + n_MA;
-end
-save('Processed_data/Testing_Cbsi.mat','HbO_Cbsi','HbR_Cbsi','n_Cbsi')
+% %% Wavelet01
+% HbO_Wavelet01 = [];
+% HbR_Wavelet01 = [];
+% n_Wavelet01 = 0;
+% T_Wavelet01 =   0;
+% iqr       =   0.1;
+% 
+% for i = 1:m/2
+%     dc_HbO              =   HbO_noised(i,:);
+%     dc_HbR              =   HbR_noised(i,:);
+%     dc                  =   [dc_HbO;dc_HbR]';
+%     
+%     tic
+%     [dc_avg,n_MA]       =   proc_Wavelet(dc,s,SD1,t,tIncMan,STD,OD_thred,iqr);
+%     T_Wavelet01         =   T_Wavelet01 + toc;
+%     
+%     HbO_Wavelet01(end+1,:)  = dc_avg(:,1)';
+%     HbR_Wavelet01(end+1,:)  = dc_avg(:,2)';
+%     n_Wavelet01             =   n_Wavelet01 + n_MA;
+% end
+% save('Processed_data/Testing_Wavelet01.mat','HbO_Wavelet01','HbR_Wavelet01','n_Wavelet01')
 
-%% PCA97
-sigma   =  0.97;
-T_PCA97 =   0;
-
-for i = 1:m/2
-    dc_HbO          =   HbO_noised(i,:);
-    dc_HbR          =   HbR_noised(i,:);
-    dc              =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
-    T_PCA97         =   T_PCA97 + toc;
-    
-    HbO_PCA97(end+1,:)  = dc_avg(:,1)';
-    HbR_PCA97(end+1,:)  = dc_avg(:,2)';
-    n_PCA97             =   n_PCA97 + n_MA;
-end
-save('Processed_data/Testing_PCA97.mat','HbO_PCA97','HbR_PCA97','n_PCA97')
-%% PCA97
-sigma   =  0.99;
-T_PCA99 =   0;
-
-for i = 1:m/2
-    dc_HbO          =   HbO_noised(i,:);
-    dc_HbR          =   HbR_noised(i,:);
-    dc              =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
-    T_PCA99         =   T_PCA99 + toc;
-    
-    HbO_PCA99(end+1,:)  = dc_avg(:,1)';
-    HbR_PCA99(end+1,:)  = dc_avg(:,2)';
-    n_PCA99             =   n_PCA99 + n_MA;
-end
-save('Processed_data/Testing_PCA99.mat','HbO_PCA99','HbR_PCA99','n_PCA99')
-%% Kalman
-T_Kalman = 0;
-
-for i = 1:m/2
-    dc_HbO          =   HbO_noised(i,:);
-    dc_HbR          =   HbR_noised(i,:);
-    dc              =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]   =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
-    T_Kalman        =   T_Kalman + toc;
-    
-    HbO_Kalman(end+1,:)  = dc_avg(:,1)';
-    HbR_Kalman(end+1,:)  = dc_avg(:,2)';
-    n_Kalman             =   n_Kalman + n_MA;
-end
-save('Processed_data/Testing_Kalman.mat','HbO_Kalman','HbR_Kalman','n_Kalman')
-%% Spline
-T_Spline =   0;
-p       =   0.99;
-
-for i = 1:m/2
-    dc_HbO              =   HbO_noised(i,:);
-    dc_HbR              =   HbR_noised(i,:);
-    dc                  =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]       =   proc_Spline(dc, s, SD1, t, tIncMan, STD, OD_thred,p);
-    T_Spline            =   T_Spline + toc;
-    
-    HbO_Spline(end+1,:)  = dc_avg(:,1)';
-    HbR_Spline(end+1,:)  = dc_avg(:,2)';
-    n_Spline             =   n_Spline + n_MA;
-end
-save('Processed_data/Testing_Spline.mat','HbO_Spline','HbR_Spline','n_Spline')
-
-%% Wavelet01
-T_Wavelet01 =   0;
-iqr       =   0.1;
-
-for i = 1:m/2
-    dc_HbO              =   HbO_noised(i,:);
-    dc_HbR              =   HbR_noised(i,:);
-    dc                  =   [dc_HbO;dc_HbR]';
-    
-    tic
-    [dc_avg,n_MA]       =   proc_Wavelet(dc,s,SD1,t,tIncMan,STD,OD_thred,iqr);
-    T_Wavelet01         =   T_Wavelet01 + toc;
-    
-    HbO_Wavelet01(end+1,:)  = dc_avg(:,1)';
-    HbR_Wavelet01(end+1,:)  = dc_avg(:,2)';
-    n_Wavelet01             =   n_Wavelet01 + n_MA;
-end
-save('Processed_data/Testing_Wavelet01.mat','HbO_Wavelet01','HbR_Wavelet01','n_Wavelet01')
-
-
+% %% no correction
+% n_no_correction = 0;
+% 
+% for i = 1:m/2
+%     dc_HbO              =   HbO_noised(i,:);
+%     dc_HbR              =   HbR_noised(i,:);
+%     dc                  =   [dc_HbO;dc_HbR]';
+%     dod                 =   hmrConc2OD( dc, SD1, ppf );
+%     [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD1,tIncMan,0.5,1,STD,OD_thred);
+%     n_MA                =   count_MA(tIncAuto);
+%     
+%     n_no_correction     =   n_no_correction + n_MA;
+% end
+% 
+% save('Processed_data/Testing_no_correction.mat','n_no_correction')
 %% NN count noise
-% filepath = 'Processed_data/Test_NN_8layers.mat';
-% 
-% load(filepath)% File exists.
-% Hb_NN = Y_test_predict;
-% 
-% HbO_NN = Hb_NN(:,1:512);
-% HbR_NN = Hb_NN(:,512+1:end);
-% HbO_NN = reshape(HbO_NN',[512*5,644]);
-% HbR_NN = reshape(HbR_NN',[512*5,644]);
+filepath = 'Processed_data/Test_NN_8layers.mat';
+
+load(filepath)% File exists.
+Hb_NN = Y_test;
+m = size(Hb_NN,1);
+
+HbO_NN = Hb_NN(:,1:512);
+HbR_NN = Hb_NN(:,512+1:end);
+% HbO_NN = reshape(HbO_NN',[512*5,1684]);
+% HbR_NN = reshape(HbR_NN',[512*5,1684]);
 % HbO_NN = HbO_NN';
 % HbR_NN = HbR_NN';
-% n_NN_HbO = 0;
-% n_NN_HbR = 0;
-% for i = 1:m/2
-%     dc_HbO  =   HbO_NN(i,:);
-%     dc_HbR  =   HbR_NN(i,:);
-%     dc      =   [dc_HbO;dc_HbR]';
-%     dod     =   hmrConc2OD( dc, SD1, ppf );
-%     [~,tIncAuto]=   hmrMotionArtifactByChannel(dod,t,SD1,tIncMan,0.5,1,STD,200);
-%     
-%     [n_MA_HbO,~,~]    =   CalMotionArtifact(tIncAuto(:,1));
-%     [n_MA_HbR,~,~]    =   CalMotionArtifact(tIncAuto(:,2));
-%     n_NN_HbO = n_NN_HbO + n_MA_HbO;
-%     n_NN_HbR = n_NN_HbR + n_MA_HbR;
-% end
-% save('Processed_data/Testing_NN.mat','n_NN_HbO','n_NN_HbR')
+n_NN = 0;
+t = t(1:512);
+tIncMan = tIncMan(1:512);
+
+for i = 1:m
+    dc_HbO  =   HbO_NN(i,:);
+    dc_HbR  =   HbR_NN(i,:);
+    dc      =   [dc_HbO;dc_HbR]';
+    dod     =   hmrConc2OD( dc, SD1, ppf );
+    [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
+%     tIncAuto=   hmrMotionArtifact(dod,t,SD1,tIncMan,0.5,1,STD,OD_thred);
+    n_MA    =   count_MA(tIncAuto);
+    
+    n_NN = n_NN + n_MA;
+end
+save('Processed_data/Testing_NN.mat','n_NN')
+
 %% output time
 time_file = fopen('Processed_data/time.txt','a+');
 fprintf(time_file,'Time for Spline is %f\n',T_Spline);
-fprintf(time_file,'Time for Wavelet01 is %f\n',T_Wavelet01);
+% fprintf(time_file,'Time for Wavelet01 is %f\n',T_Wavelet01);
 fprintf(time_file,'Time for Kalman is %f\n',T_Kalman);
 fprintf(time_file,'Time for PCA97 is %f\n',T_PCA97);
 fprintf(time_file,'Time for PCA99 is %f\n',T_PCA99);
 fprintf(time_file,'Time for Cbsi is %f\n',T_Cbsi);
-% % T_Spline = 8.637879;
-% % T_Wavelet05 = 1111.117784;
-% % T_Wavelet35 = 1102.784217;
-% % T_Kalman = 55.251534;
-% % T_PCA99 = 6.714928;
-% % T_PCA50 = 7.102599;
-% % T_Cbsi = 0.461004;
-% % T_DAE = 0.3288;
+
 
 % T_list = [T_Spline,T_Wavelet01,T_Kalman,T_PCA99,T_PCA97,T_Cbsi,T_DAE];
 % labels = {'Spline','Wavelet01','Kalman','PCA99','PCA79','Cbsi','DAE'};

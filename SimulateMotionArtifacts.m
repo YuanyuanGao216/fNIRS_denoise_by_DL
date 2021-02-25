@@ -132,7 +132,7 @@ save('Processed_data/Noise.mat','Noise_train','Noise_val','Noise_test')
 % Resting
 save('Processed_data/Resting.mat','Resting_train','Resting_val','Resting_test')
 % number of noise
-save('Processed_data/n_MA_list.mat','peak_n_list','shift_n_list')
+save('Processed_data/n_MA_list.mat','peak_n_list','shift_n_list','p')
 
 %% sub functions
 function noise = add_peak(noise,diff_HbO_list,t0)
