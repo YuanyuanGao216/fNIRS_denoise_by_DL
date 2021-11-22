@@ -9,8 +9,25 @@ pathHomer = 'Tools/homer2_src_v2_3_10202017/';
 oldpath = cd(pathHomer);
 setpaths;
 cd(oldpath);
-%% load data
-load('Processed_data/SimulateData.mat','HRF_test','HRF_test_noised')
+%% load data since it is leave one out so we need to load every test dataset
+DataDir = 'Processed_data';
+subfolders = dir(DataDir);
+subfolders = subfolders([subfolders.isdir] & ~startsWith({subfolders.name},'.'));
+HRF_test_mat = [];
+HRF_test_noised_mat = [];
+for subfolder = 1:length(subfolders)
+    fprintf('subfolder is %d\n', subfolder)
+    sim_path = fullfile(DataDir, subfolders(subfolder).name, 'SimulateData.mat');
+    %% load data
+    load(sim_path,'HRF_test','HRF_test_noised')
+    HRF_test_mat = [HRF_test_mat; HRF_test];
+    HRF_test_noised_mat = [HRF_test_noised_mat; HRF_test_noised];
+end
+k = randperm(size(HRF_test_mat,1));
+HRF_test = HRF_test_mat(k(1:1000),:);
+HRF_test_noised = HRF_test_noised_mat(k(1:1000),:);
+clear HRF_test_mat HRF_test_noised_mat
+
 tp = size(HRF_test,2);
 t = (1:tp)/fs_new;
 
@@ -35,43 +52,43 @@ fclose('all')
 filename = 'Processed_data/Sensitivity.txt';
 Sensitivity_file = fopen(filename,'w');
 %%
-sigma_PCA_list = 0.51:0.01:0.99;
-mse_list = zeros(length(sigma_PCA_list),m/2);
-n_list = zeros(length(sigma_PCA_list),m/2);
-for j = 1:length(sigma_PCA_list)
-    sigma = sigma_PCA_list(j);
-    fprintf('sigma: %f\n',sigma)
-    for i = 1:m/2
-        dc_HbO              =   HbO_noised(i,:);
-        dc_HbR              =   HbR_noised(i,:);
-        dc                  =   [dc_HbO;dc_HbR]';
-        [dc_avg,n_MA]       =   proc_PCA(dc, s, SD1, t, tIncMan, STD, OD_thred, sigma);
-        dc_predict          =   [dc_avg(:,1)', dc_avg(:,2)'];
-        n_list(j,i)         =   n_MA;
-        dc_real             =   [HbO(i,1:512),HbR(i,1:512)];
-        mse_list(j,i)       =   mean((dc_predict - dc_real).^2);
-    end
-end
-%%
-save('Processed_data/sens_PCA.mat','sigma_PCA_list','n_list','mse_list')
-plot_sens(sigma_PCA_list,n_list,mse_list,'PCA','sigma')
-
-fprintf('PCA:\n')
-fprintf(Sensitivity_file,'PCA:\n');
-
-mean_n_list = mean(n_list,2);
-
-for k = 1:length(mean_n_list)
-    fprintf('n is %f \t sigma is %f\n',mean_n_list(k), sigma_PCA_list(k))
-    fprintf(Sensitivity_file,'n is %f \t sigma is %f\n',mean_n_list(k), sigma_PCA_list(k));
-end
-
-mean_mse_list = mean(mse_list,2)*1e9;
-for k = 1:length(mean_mse_list)
-    fprintf('mse is %f \t sigma is %f\n',mean_mse_list(k),sigma_PCA_list(k))
-    fprintf(Sensitivity_file,'mse is %f \t sigma is %f\n',mean_mse_list(k),sigma_PCA_list(k));
-end
-%%
+% sigma_PCA_list = 0.51:0.01:0.99;
+% mse_list = zeros(length(sigma_PCA_list),m/2);
+% n_list = zeros(length(sigma_PCA_list),m/2);
+% for j = 1:length(sigma_PCA_list)
+%     sigma = sigma_PCA_list(j);
+%     fprintf('sigma: %f\n',sigma)
+%     for i = 1:m/2
+%         dc_HbO              =   HbO_noised(i,:);
+%         dc_HbR              =   HbR_noised(i,:);
+%         dc                  =   [dc_HbO;dc_HbR]';
+%         [dc_avg,n_MA]       =   proc_PCA(dc, s, SD1, t, tIncMan, STD, OD_thred, sigma);
+%         dc_predict          =   [dc_avg(:,1)', dc_avg(:,2)'];
+%         n_list(j,i)         =   n_MA;
+%         dc_real             =   [HbO(i,1:512),HbR(i,1:512)];
+%         mse_list(j,i)       =   mean((dc_predict - dc_real).^2);
+%     end
+% end
+% %%
+% save('Processed_data/sens_PCA.mat','sigma_PCA_list','n_list','mse_list')
+% plot_sens(sigma_PCA_list,n_list,mse_list,'PCA','sigma')
+% 
+% fprintf('PCA:\n')
+% fprintf(Sensitivity_file,'PCA:\n');
+% 
+% mean_n_list = mean(n_list,2);
+% 
+% for k = 1:length(mean_n_list)
+%     fprintf('n is %f \t sigma is %f\n',mean_n_list(k), sigma_PCA_list(k))
+%     fprintf(Sensitivity_file,'n is %f \t sigma is %f\n',mean_n_list(k), sigma_PCA_list(k));
+% end
+% 
+% mean_mse_list = mean(mse_list,2)*1e9;
+% for k = 1:length(mean_mse_list)
+%     fprintf('mse is %f \t sigma is %f\n',mean_mse_list(k),sigma_PCA_list(k))
+%     fprintf(Sensitivity_file,'mse is %f \t sigma is %f\n',mean_mse_list(k),sigma_PCA_list(k));
+% end
+% %%
 p_Spline_list = 0:0.01:1;
 mse_list = zeros(length(p_Spline_list),m/2);
 n_list = zeros(length(p_Spline_list),m/2);
@@ -110,7 +127,7 @@ end
 
 
 %%
-iqr_Wavelet = 0.1:0.05:0.4;
+iqr_Wavelet = [0.1:0.05:0.4 0.5:0.25:1.5];
 mse_list = zeros(length(iqr_Wavelet),m/2);
 n_list = zeros(length(iqr_Wavelet),m/2);
 for j = 1: length(iqr_Wavelet)

@@ -1,7 +1,7 @@
 clear all
 
 %% add homer path
-pathHomer   = '../../Tools/homer2_src_v2_3_10202017';
+pathHomer   = 'Tools/homer2_src_v2_3_10202017';
 oldpath     = cd(pathHomer);
 setpaths;
 cd(oldpath);
@@ -9,20 +9,22 @@ cd(oldpath);
 %% define constants
 define_constants
 
-%% define variables to be calulated
-% amplitude of change
-diff_HbO_list   =   [];
-diff_HbR_list   =   [];
-% duration of change
-duration_HbO_list = [];
-duration_HbR_list = [];
-% density of MA, chances of MA to happen along time
-d_MA_list   =   [];
+STD = 10;
 
 %% load fNIRS file
 DataDir = 'Data';
 Files = dir(fullfile(DataDir,'*.nirs'));
-for file = 1:length(Files) - 1 % save the last one for testing
+for file = 1:length(Files) % leave one out
+    %% define variables to be calulated
+    % amplitude of change
+    diff_HbO_list   =   [];
+    diff_HbR_list   =   [];
+    % duration of change
+    duration_HbO_list = [];
+    duration_HbR_list = [];
+    % density of MA, chances of MA to happen along time
+    d_MA_list   =   [];
+    
     name = Files(file).name;
     fprintf('fnirs file is %s\n',name);
     fNIRS_data = load([DataDir,'/',name],'-mat');
@@ -67,8 +69,9 @@ for file = 1:length(Files) - 1 % save the last one for testing
             end
         end
     end
+    %%
+    % save the diffs and dist. of MA
+    data_path = sprintf('Processed_data/leave_%d_out',file);
+    mkdir(data_path)
+    save([data_path,'/list.mat'],'diff_HbO_list','diff_HbR_list','d_MA_list','duration_HbO_list','duration_HbR_list');
 end
-%%
-% save the diffs and dist. of MA
-save('Processed_data/list.mat','diff_HbO_list','diff_HbR_list','d_MA_list','duration_HbO_list','duration_HbR_list');
-

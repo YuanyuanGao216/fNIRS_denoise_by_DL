@@ -74,6 +74,7 @@ index = find(s == 1);
 for i = index
     p = plot([t(i) t(i)],yl,'k:','linewidth',1);
 end
+hold off
 xlim([0 512*5/fs_new])
 ylabel('\muMol')
 xlabel('Second')

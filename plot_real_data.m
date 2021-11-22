@@ -81,5 +81,5 @@ xlim([min(x) max(x)])
 set(gca,'fontname','Arial','fontsize',fs)
 
 set(gcf,'position',[17   356   759   386])
-save('Figures/Resting_data_example.fig')
-save('Figures/Resting_data_example.svg')
+saveas(gcf,'Figures/Resting_data_example.fig')
+saveas(gcf,'Figures/Resting_data_example.svg')

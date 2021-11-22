@@ -7,7 +7,12 @@ xo                      =   ones(1,length(oscFreq)+1)*y(1,1);
 Po                      =   ones(1,length(oscFreq)+1)*(y(1,1)^2);
 Qo                      =   zeros(1,length(oscFreq)+1);
 hrfParam                =   [2 2];
-[~, ~,dod,~,~,~]        =   hmrKalman2( y, s', t, xo, Po, Qo, 'box', hrfParam, oscFreq );
+if size(s,1) > 1
+    s_kalman = s(1,:) + s(2,:);
+else
+    s_kalman = s;
+end
+[~, ~,dod,~,~,~]        =   hmrKalman2( y, s_kalman', t, xo, Po, Qo, 'box', hrfParam, oscFreq );
 % [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
 tIncAuto            =   hmrMotionArtifact(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
 dod                     =   hmrBandpassFilt(dod,t,0,0.5);

@@ -4,6 +4,7 @@ global fs_new
 dod                     =   hmrConc2OD( dc, SD, [6 6] );
 [~,tIncChAuto]          =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
 [dod]                   =   hmrMotionCorrectSpline(dod,t,SD,tIncChAuto,p);
+% dod                     =   hmrMotionCorrectSplineSG(dod, d, t, SD, p, FrameSize_sec);
 % [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
 tIncAuto            =   hmrMotionArtifact(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
 dod                     =   hmrBandpassFilt(dod,t,0,0.5);
