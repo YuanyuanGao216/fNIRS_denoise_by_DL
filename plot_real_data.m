@@ -33,7 +33,7 @@ if size(start_p) ~=0
 end
 legend([h p(1)],'\DeltaHbO','Motion artifact', 'location', 'northeastoutside')
 title('Experimental data example')
-ylabel('\muMol');
+ylabel('\muMol\cdotmm');
 % xlabel('Time(s)');
 xlim([min(t) max(t)])
 set(gca,'fontname','Arial','fontsize',fs)
@@ -43,7 +43,7 @@ hold on
 x = t(start_p(2):end_p(2));
 plot(x,dc(start_p(2):end_p(2)),'b-','linewidth',1);
 title('Motion artifact')
-ylabel('\muMol');
+ylabel('\muMol\cdotmm');
 % xlabel('Time(s)');
 xlim([min(x) max(x)])
 set(gca,'fontname','Arial','fontsize',fs)
@@ -52,7 +52,7 @@ subplot(3,2,4)
 hold on
 plot(t_span,Resting_HbO,'b-','linewidth',1);
 title('Resting state data')
-ylabel('\muMol');
+ylabel('\muMol\cdotmm');
 % xlabel('Time(s)');
 xlim([min(t_span) max(t_span)])
 set(gca,'fontname','Arial','fontsize',fs)
@@ -75,7 +75,7 @@ end
 legend([h,p],{'Resting fNIRS','Stim'},'Location','northeast')
 
 title('Simulated resting state data')
-ylabel('\muMol');
+ylabel('\muMol\cdotmm');
 % xlabel('Time(s)');
 xlim([min(x) max(x)])
 set(gca,'fontname','Arial','fontsize',fs)

@@ -2,11 +2,11 @@
 rng(101, 'twister')
 % simulate the resting data from real
 % SimulateRestingData % sim_Resting
-% % characterize noise from real
+% % % characterize noise from real
 % Characterize_noise % list
-% Simulate motion artifacts
+% % Simulate motion artifacts
 % SimulateMotionArtifacts; % SimulateData; Noise; Resting; n_MA_list;Example
-% Do sensitivity analysis for paras in PCA, spline and wavelet on real
+% % Do sensitivity analysis for paras in PCA, spline and wavelet on real
 % Sensitivity_analysis
 
 %% real data processing
@@ -18,4 +18,4 @@ rng(101, 'twister')
 %% Use paras above to process simulated data
 % Process_test_data
 %% Plot results
-% Plot_Results_New
+Plot_Results_New

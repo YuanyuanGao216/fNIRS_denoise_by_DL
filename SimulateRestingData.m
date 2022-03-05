@@ -12,8 +12,8 @@ cd(oldpath);
 DataDir = 'Data';
 Files = dir(fullfile(DataDir,'*.nirs'));
 figure_flag = 0;
-for file_leftout = 1:length(Files) % leave one out
-% for file_leftout = 2:2 % leave one out
+% for file_leftout = 1:length(Files) % leave one out
+for file_leftout = 8:8 % leave one out
     %% variables to be calculated
     simulated_HbO = [];
     simulated_HbR = [];
@@ -66,10 +66,10 @@ for file_leftout = 1:length(Files) % leave one out
 %                 state1 = 0;
 %                 state2 = 0;
                 % if the amplitude of sim is 30 times larger, skip
-                if abs(max(sim_data_HbO)) > abs(max(Resting_HbO)) * 30 || state1 == 1
+                if state1 == 1 || abs(max(sim_data_HbO)) > abs(max(Resting_HbO)) * 30
                     continue
                 end
-                if abs(max(sim_data_HbR)) > abs(max(Resting_HbR)) * 30 || state2 == 1
+                if state2 == 1 || abs(max(sim_data_HbR)) > abs(max(Resting_HbR)) * 30 
                     continue
                 end
                 % plot an example

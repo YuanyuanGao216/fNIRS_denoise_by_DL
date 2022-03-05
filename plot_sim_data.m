@@ -31,7 +31,7 @@ for i = index
     p = plot([t(i) t(i)],yl,'k:','linewidth',1);
 end
 xlim([min(t),max(t)])
-ylabel('\muMol')
+ylabel('\muMol\cdotmm');
 title('Simulated evoked responses')
 legend([h,p],{'Evoked response','Stim'},'Location','northeast')
 set(gca, 'FontName', 'Arial','fontsize',10)
@@ -47,7 +47,7 @@ for i = index
 end
 % ylim([-10 150].*1e-6)
 xlim([0 512*5/fs_new])
-ylabel('\muMol')
+ylabel('\muMol\cdotmm');
 title('Simulated motion artifacts')
 legend([h,p],{'Motion artifacts','Stim'},'Location','northeast')
 set(gca, 'FontName', 'Arial','fontsize',10)
@@ -61,7 +61,7 @@ for i = index
     p = plot([t(i) t(i)],yl,'k:','linewidth',1);
 end
 xlim([0 512*5/fs_new])
-ylabel('\muMol')
+ylabel('\muMol\cdotmm');
 title('Simulated resting fNIRS data')
 legend([h,p],{'Resting fNIRS','Stim'},'Location','northeast')
 set(gca, 'FontName', 'Arial','fontsize',10)
@@ -76,7 +76,7 @@ for i = index
 end
 hold off
 xlim([0 512*5/fs_new])
-ylabel('\muMol')
+ylabel('\muMol\cdotmm');
 xlabel('Second')
 title('Simulated noised HRFs')
 legend([h,p],{'Noised HRFs','Stim'},'Location','northeast')

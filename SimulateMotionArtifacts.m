@@ -107,11 +107,11 @@ for subfolder = 1:length(subfolders)
         % a time-to-peak of 7 s, a duration of 20 s and an amplitude defined
         % so as to produce a 15µM increase in HbO concentration and a
         % 5µM decrease in HbR concentration [these figures include a partial volume correction factor of 50 (Strangman et al., 2003)]. S
-        % so I used 10~20µM increase
+        % so I used 10~20µM increase 15*30*6/50 = 54uMol*mm
         % change it to 0~20
         % even though from 0, it doesn't perform good on 0 activations,
         % need to add more 0 samples
-        amp_HbO = 10 + (20 - 10) * rand; % 10-20
+        amp_HbO = 30 + (80 - 30) * rand; % 30-80
         time_to_peak = 1 + (11 - 1)*rand; % 1-11
         duration = 15 + (30 - 15)*rand; % 1-30
         sigma = 5 + (15 - 5)*rand;

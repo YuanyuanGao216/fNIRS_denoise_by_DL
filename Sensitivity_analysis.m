@@ -42,7 +42,7 @@ SD1.MeasListAct = [1 1];
 SD1.Lambda = [760;850];
 SD1.SrcPos = [-2.9017 10.2470 -0.4494];
 SD1.DetPos = [-4.5144 9.0228 -1.6928];
-ppf = [6,6];
+% ppf = [6,6];
 
 tIncMan=ones(size(t))';
 s = zeros(1,tp);
@@ -69,7 +69,7 @@ Sensitivity_file = fopen(filename,'w');
 %         mse_list(j,i)       =   mean((dc_predict - dc_real).^2);
 %     end
 % end
-% %%
+%%
 % save('Processed_data/sens_PCA.mat','sigma_PCA_list','n_list','mse_list')
 % plot_sens(sigma_PCA_list,n_list,mse_list,'PCA','sigma')
 % 

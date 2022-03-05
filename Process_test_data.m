@@ -26,7 +26,7 @@ for subfolder = 1:length(subfolders)
     SD1.Lambda = [760;850];
     SD1.SrcPos = [-2.9017 10.2470 -0.4494];
     SD1.DetPos = [-4.5144 9.0228 -1.6928];
-    ppf = [6,6];
+    ppf = [1,1];
     t  = 1/fs_new:1/fs_new:size(HbO_noised,2)/fs_new;
     s  = zeros(1,length(t));
     s((rt):512:length(t)) = 1;
@@ -53,35 +53,13 @@ for subfolder = 1:length(subfolders)
     end
     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Cbsi.mat');
     save(save_path,'HbO_Cbsi','HbR_Cbsi','n_Cbsi', 'T_Cbsi')
-
-    %% PCA97
-    HbO_PCA97   = [];
-    HbR_PCA97   = [];
-    n_PCA97 = 0;
-    sigma   =  0.97;
-    T_PCA97 =   0;
-
-    for i = 1:m/2
-        dc_HbO          =   HbO_noised(i,:);
-        dc_HbR          =   HbR_noised(i,:);
-        dc              =   [dc_HbO;dc_HbR]';
-
-        tic
-        [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
-        T_PCA97         =   T_PCA97 + toc;
-
-        HbO_PCA97(end+1,:)  = dc_avg(:,1)';
-        HbR_PCA97(end+1,:)  = dc_avg(:,2)';
-        n_PCA97             =   n_PCA97 + n_MA;
-    end
-    save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_PCA97.mat');
-    save(save_path, 'HbO_PCA97', 'HbR_PCA97', 'n_PCA97', 'T_PCA97')
-%     %% PCA99
-%     HbO_PCA99   = [];
-%     HbR_PCA99   = [];
-%     n_PCA99 = 0;
-%     sigma   =  0.99;
-%     T_PCA99 =   0;
+% 
+%     %% PCA97
+%     HbO_PCA97   = [];
+%     HbR_PCA97   = [];
+%     n_PCA97 = 0;
+%     sigma   =  0.97;
+%     T_PCA97 =   0;
 % 
 %     for i = 1:m/2
 %         dc_HbO          =   HbO_noised(i,:);
@@ -90,95 +68,117 @@ for subfolder = 1:length(subfolders)
 % 
 %         tic
 %         [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
-%         T_PCA99         =   T_PCA99 + toc;
+%         T_PCA97         =   T_PCA97 + toc;
 % 
-%         HbO_PCA99(end+1,:)  = dc_avg(:,1)';
-%         HbR_PCA99(end+1,:)  = dc_avg(:,2)';
-%         n_PCA99             =   n_PCA99 + n_MA;
+%         HbO_PCA97(end+1,:)  = dc_avg(:,1)';
+%         HbR_PCA97(end+1,:)  = dc_avg(:,2)';
+%         n_PCA97             =   n_PCA97 + n_MA;
 %     end
-%     save('Processed_data/Testing_PCA99.mat','HbO_PCA99','HbR_PCA99','n_PCA99')
-    %% Kalman
-    HbO_Kalman  = [];
-    HbR_Kalman  = [];
-    n_Kalman = 0;
-    T_Kalman = 0;
-
-    for i = 1:m/2
-        dc_HbO          =   HbO_noised(i,:);
-        dc_HbR          =   HbR_noised(i,:);
-        dc              =   [dc_HbO;dc_HbR]';
-
-        tic
-        [dc_avg,n_MA]   =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
-        T_Kalman        =   T_Kalman + toc;
-
-        HbO_Kalman(end+1,:)  = dc_avg(:,1)';
-        HbR_Kalman(end+1,:)  = dc_avg(:,2)';
-        n_Kalman             =   n_Kalman + n_MA;
-    end
-    save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Kalman.mat');
-    save(save_path, 'HbO_Kalman', 'HbR_Kalman', 'n_Kalman', 'T_Kalman')
-    %% Spline
-    HbO_Spline  = [];
-    HbR_Spline  = [];
-    n_Spline = 0;
-    T_Spline =   0;
-    p       =   0.99;
-
-    for i = 1:m/2
-        dc_HbO              =   HbO_noised(i,:);
-        dc_HbR              =   HbR_noised(i,:);
-        dc                  =   [dc_HbO;dc_HbR]';
-
-        tic
-        [dc_avg,n_MA]       =   proc_Spline(dc, s, SD1, t, tIncMan, STD, OD_thred,p);
-        T_Spline            =   T_Spline + toc;
-
-        HbO_Spline(end+1,:)  = dc_avg(:,1)';
-        HbR_Spline(end+1,:)  = dc_avg(:,2)';
-        n_Spline             =   n_Spline + n_MA;
-    end
-    save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Spline.mat');
-    save(save_path, 'HbO_Spline', 'HbR_Spline', 'n_Spline', 'T_Spline')
-
-    %% Wavelet01
-    HbO_Wavelet01 = [];
-    HbR_Wavelet01 = [];
-    n_Wavelet01 = 0;
-    T_Wavelet01 =   0;
-    iqr       =   0.75;
-
-    for i = 1:m/2
-        dc_HbO              =   HbO_noised(i,:);
-        dc_HbR              =   HbR_noised(i,:);
-        dc                  =   [dc_HbO;dc_HbR]';
-
-        tic
-        [dc_avg,n_MA]       =   proc_Wavelet(dc,s,SD1,t,tIncMan,STD,OD_thred,iqr);
-        T_Wavelet01         =   T_Wavelet01 + toc;
-
-        HbO_Wavelet01(end+1,:)  = dc_avg(:,1)';
-        HbR_Wavelet01(end+1,:)  = dc_avg(:,2)';
-        n_Wavelet01             =   n_Wavelet01 + n_MA;
-    end
-    save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Wavelet01.mat');
-    save(save_path,'HbO_Wavelet01','HbR_Wavelet01','n_Wavelet01', 'T_Wavelet01')
-
-    %% no correction
-    n_no_correction = 0;
-
-    for i = 1:m/2
-        dc_HbO              =   HbO_noised(i,:);
-        dc_HbR              =   HbR_noised(i,:);
-        dc                  =   [dc_HbO;dc_HbR]';
-        dod                 =   hmrConc2OD( dc, SD1, ppf );
-        [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD1,tIncMan,0.5,1,STD,OD_thred);
-        n_MA                =   count_MA(tIncAuto);
-
-        n_no_correction     =   n_no_correction + n_MA;
-    end
-    save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_no_correction.mat');
-    save(save_path,'n_no_correction')
+%     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_PCA97.mat');
+%     save(save_path, 'HbO_PCA97', 'HbR_PCA97', 'n_PCA97', 'T_PCA97')
+% %     %% PCA99
+% %     HbO_PCA99   = [];
+% %     HbR_PCA99   = [];
+% %     n_PCA99 = 0;
+% %     sigma   =  0.99;
+% %     T_PCA99 =   0;
+% % 
+% %     for i = 1:m/2
+% %         dc_HbO          =   HbO_noised(i,:);
+% %         dc_HbR          =   HbR_noised(i,:);
+% %         dc              =   [dc_HbO;dc_HbR]';
+% % 
+% %         tic
+% %         [dc_avg,n_MA]   =   proc_PCA(dc, s, SD, t, tIncMan,STD, OD_thred, sigma);
+% %         T_PCA99         =   T_PCA99 + toc;
+% % 
+% %         HbO_PCA99(end+1,:)  = dc_avg(:,1)';
+% %         HbR_PCA99(end+1,:)  = dc_avg(:,2)';
+% %         n_PCA99             =   n_PCA99 + n_MA;
+% %     end
+% %     save('Processed_data/Testing_PCA99.mat','HbO_PCA99','HbR_PCA99','n_PCA99')
+%     %% Kalman
+%     HbO_Kalman  = [];
+%     HbR_Kalman  = [];
+%     n_Kalman = 0;
+%     T_Kalman = 0;
+% 
+%     for i = 1:m/2
+%         dc_HbO          =   HbO_noised(i,:);
+%         dc_HbR          =   HbR_noised(i,:);
+%         dc              =   [dc_HbO;dc_HbR]';
+% 
+%         tic
+%         [dc_avg,n_MA]   =   proc_Kalman(dc,s,SD,t,tIncMan,OD_thred,STD);
+%         T_Kalman        =   T_Kalman + toc;
+% 
+%         HbO_Kalman(end+1,:)  = dc_avg(:,1)';
+%         HbR_Kalman(end+1,:)  = dc_avg(:,2)';
+%         n_Kalman             =   n_Kalman + n_MA;
+%     end
+%     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Kalman.mat');
+%     save(save_path, 'HbO_Kalman', 'HbR_Kalman', 'n_Kalman', 'T_Kalman')
+%     %% Spline
+%     HbO_Spline  = [];
+%     HbR_Spline  = [];
+%     n_Spline = 0;
+%     T_Spline =   0;
+%     p       =   0.99;
+% 
+%     for i = 1:m/2
+%         dc_HbO              =   HbO_noised(i,:);
+%         dc_HbR              =   HbR_noised(i,:);
+%         dc                  =   [dc_HbO;dc_HbR]';
+% 
+%         tic
+%         [dc_avg,n_MA]       =   proc_Spline(dc, s, SD1, t, tIncMan, STD, OD_thred,p);
+%         T_Spline            =   T_Spline + toc;
+% 
+%         HbO_Spline(end+1,:)  = dc_avg(:,1)';
+%         HbR_Spline(end+1,:)  = dc_avg(:,2)';
+%         n_Spline             =   n_Spline + n_MA;
+%     end
+%     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Spline.mat');
+%     save(save_path, 'HbO_Spline', 'HbR_Spline', 'n_Spline', 'T_Spline')
+% 
+%     %% Wavelet01
+%     HbO_Wavelet01 = [];
+%     HbR_Wavelet01 = [];
+%     n_Wavelet01 = 0;
+%     T_Wavelet01 =   0;
+%     iqr       =   0.75;
+% 
+%     for i = 1:m/2
+%         dc_HbO              =   HbO_noised(i,:);
+%         dc_HbR              =   HbR_noised(i,:);
+%         dc                  =   [dc_HbO;dc_HbR]';
+% 
+%         tic
+%         [dc_avg,n_MA]       =   proc_Wavelet(dc,s,SD1,t,tIncMan,STD,OD_thred,iqr);
+%         T_Wavelet01         =   T_Wavelet01 + toc;
+% 
+%         HbO_Wavelet01(end+1,:)  = dc_avg(:,1)';
+%         HbR_Wavelet01(end+1,:)  = dc_avg(:,2)';
+%         n_Wavelet01             =   n_Wavelet01 + n_MA;
+%     end
+%     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_Wavelet01.mat');
+%     save(save_path,'HbO_Wavelet01','HbR_Wavelet01','n_Wavelet01', 'T_Wavelet01')
+% 
+%     %% no correction
+%     n_no_correction = 0;
+% 
+%     for i = 1:m/2
+%         dc_HbO              =   HbO_noised(i,:);
+%         dc_HbR              =   HbR_noised(i,:);
+%         dc                  =   [dc_HbO;dc_HbR]';
+%         dod                 =   hmrConc2OD_modified( dc, SD1, ppf );
+%         [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD1,tIncMan,0.5,1,STD,OD_thred);
+%         n_MA                =   count_MA(tIncAuto);
+% 
+%         n_no_correction     =   n_no_correction + n_MA;
+%     end
+%     save_path = fullfile(DataDir, subfolders(subfolder).name, 'Testing_no_correction.mat');
+%     save(save_path,'n_no_correction')
     %% NN count noise
     NN_path = fullfile(DataDir, subfolders(subfolder).name, 'Test_NN_8layers.mat');
 
@@ -200,7 +200,7 @@ for subfolder = 1:length(subfolders)
         dc_HbO  =   HbO_NN(i,:);
         dc_HbR  =   HbR_NN(i,:);
         dc      =   [dc_HbO;dc_HbR]';
-        dod     =   hmrConc2OD( dc, SD1, ppf );
+        dod     =   hmrConc2OD_modified( dc, SD1, ppf );
         [~,tIncAuto]            =   hmrMotionArtifactByChannel(dod,t,SD,tIncMan,0.5,1,STD,OD_thred);
     %     tIncAuto=   hmrMotionArtifact(dod,t,SD1,tIncMan,0.5,1,STD,OD_thred);
         n_MA    =   count_MA(tIncAuto);
